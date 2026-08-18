@@ -1,0 +1,5 @@
+[build]
+incremental = false
+
+[term]
+color = "always"

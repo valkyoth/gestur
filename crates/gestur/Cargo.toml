@@ -1,0 +1,25 @@
+[package]
+name = "gestur"
+description = "Security-first visitor and guest orchestration platform facade."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+publish.workspace = true
+
+[dependencies]
+gestur-api-types.workspace = true
+gestur-core.workspace = true
+gestur-crypto-types.workspace = true
+gestur-events.workspace = true
+gestur-policy.workspace = true
+gestur-schema.workspace = true
+gestur-workflow.workspace = true
+
+[dev-dependencies]
+gestur-testkit.workspace = true
+
+[lints]
+workspace = true

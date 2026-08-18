@@ -1,0 +1,392 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "creationInfo": {
+    "created": "2026-08-18T19:23:42Z",
+    "creators": [
+      "Tool: cargo-sbom-v0.10.0"
+    ]
+  },
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "https://spdx.org/spdxdocs/gestur-ccd2a7a9-c022-4418-b3f3-128b059555b9",
+  "files": [
+    {
+      "SPDXID": "SPDXRef-File-gestur",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "3ef85c65a887d4847054c41b8e7f4b35eb620a97"
+        }
+      ],
+      "fileName": "./Cargo.lock",
+      "fileTypes": [
+        "SOURCE",
+        "TEXT"
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File-gestur_api_types",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "3ef85c65a887d4847054c41b8e7f4b35eb620a97"
+        }
+      ],
+      "fileName": "./Cargo.lock",
+      "fileTypes": [
+        "SOURCE",
+        "TEXT"
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File-gestur_core",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "3ef85c65a887d4847054c41b8e7f4b35eb620a97"
+        }
+      ],
+      "fileName": "./Cargo.lock",
+      "fileTypes": [
+        "SOURCE",
+        "TEXT"
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File-gestur_crypto_types",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "3ef85c65a887d4847054c41b8e7f4b35eb620a97"
+        }
+      ],
+      "fileName": "./Cargo.lock",
+      "fileTypes": [
+        "SOURCE",
+        "TEXT"
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File-gestur_events",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "3ef85c65a887d4847054c41b8e7f4b35eb620a97"
+        }
+      ],
+      "fileName": "./Cargo.lock",
+      "fileTypes": [
+        "SOURCE",
+        "TEXT"
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File-gestur_policy",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "3ef85c65a887d4847054c41b8e7f4b35eb620a97"
+        }
+      ],
+      "fileName": "./Cargo.lock",
+      "fileTypes": [
+        "SOURCE",
+        "TEXT"
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File-gestur_schema",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "3ef85c65a887d4847054c41b8e7f4b35eb620a97"
+        }
+      ],
+      "fileName": "./Cargo.lock",
+      "fileTypes": [
+        "SOURCE",
+        "TEXT"
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File-gestur_testkit",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "3ef85c65a887d4847054c41b8e7f4b35eb620a97"
+        }
+      ],
+      "fileName": "./Cargo.lock",
+      "fileTypes": [
+        "SOURCE",
+        "TEXT"
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-File-gestur_workflow",
+      "checksums": [
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "3ef85c65a887d4847054c41b8e7f4b35eb620a97"
+        }
+      ],
+      "fileName": "./Cargo.lock",
+      "fileTypes": [
+        "SOURCE",
+        "TEXT"
+      ]
+    }
+  ],
+  "name": "gestur",
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-gestur-schema-0.1.0",
+      "description": "Portable field and data-classification schemas for Gestur.",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "EUPL-1.2",
+      "licenseDeclared": "EUPL-1.2",
+      "name": "gestur-schema",
+      "versionInfo": "0.1.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-gestur-core-0.1.0",
+      "description": "Dependency-free domain primitives for Gestur.",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "EUPL-1.2",
+      "licenseDeclared": "EUPL-1.2",
+      "name": "gestur-core",
+      "versionInfo": "0.1.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-gestur-crypto-types-0.1.0",
+      "description": "Algorithm-agile cryptographic metadata types for Gestur.",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "EUPL-1.2",
+      "licenseDeclared": "EUPL-1.2",
+      "name": "gestur-crypto-types",
+      "versionInfo": "0.1.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-gestur-workflow-0.1.0",
+      "description": "Declarative Guest Journey primitives for Gestur.",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "EUPL-1.2",
+      "licenseDeclared": "EUPL-1.2",
+      "name": "gestur-workflow",
+      "versionInfo": "0.1.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-gestur-api-types-0.1.0",
+      "description": "Transport-neutral command and error types for Gestur APIs.",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "EUPL-1.2",
+      "licenseDeclared": "EUPL-1.2",
+      "name": "gestur-api-types",
+      "versionInfo": "0.1.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-gestur-events-0.1.0",
+      "description": "Versioned domain-event envelopes for Gestur.",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "EUPL-1.2",
+      "licenseDeclared": "EUPL-1.2",
+      "name": "gestur-events",
+      "versionInfo": "0.1.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-gestur-policy-0.1.0",
+      "description": "Authorization and capability policy primitives for Gestur.",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "EUPL-1.2",
+      "licenseDeclared": "EUPL-1.2",
+      "name": "gestur-policy",
+      "versionInfo": "0.1.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-gestur-testkit-0.1.0",
+      "description": "Deterministic, dependency-free test helpers for Gestur.",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "EUPL-1.2",
+      "licenseDeclared": "EUPL-1.2",
+      "name": "gestur-testkit",
+      "versionInfo": "0.1.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-gestur-0.1.0",
+      "description": "Security-first visitor and guest orchestration platform facade.",
+      "downloadLocation": "NONE",
+      "homepage": "https://github.com/valkyoth/gestur",
+      "licenseConcluded": "EUPL-1.2",
+      "licenseDeclared": "EUPL-1.2",
+      "name": "gestur",
+      "versionInfo": "0.1.0"
+    }
+  ],
+  "relationships": [
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-core-0.1.0",
+      "relationshipType": "GENERATED_FROM",
+      "spdxElementId": "SPDXRef-File-gestur_core"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-testkit-0.1.0",
+      "relationshipType": "GENERATED_FROM",
+      "spdxElementId": "SPDXRef-File-gestur_testkit"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-crypto-types-0.1.0",
+      "relationshipType": "GENERATED_FROM",
+      "spdxElementId": "SPDXRef-File-gestur_crypto_types"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-File-gestur",
+      "relationshipType": "DESCRIBES",
+      "spdxElementId": "SPDXRef-DOCUMENT"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-crypto-types-0.1.0",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-gestur-0.1.0"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-core-0.1.0",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-gestur-workflow-0.1.0"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-core-0.1.0",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-gestur-schema-0.1.0"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-api-types-0.1.0",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-gestur-0.1.0"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-core-0.1.0",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-gestur-api-types-0.1.0"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-core-0.1.0",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-gestur-policy-0.1.0"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-api-types-0.1.0",
+      "relationshipType": "GENERATED_FROM",
+      "spdxElementId": "SPDXRef-File-gestur_api_types"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-core-0.1.0",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-gestur-events-0.1.0"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-events-0.1.0",
+      "relationshipType": "GENERATED_FROM",
+      "spdxElementId": "SPDXRef-File-gestur_events"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-workflow-0.1.0",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-gestur-0.1.0"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-File-gestur_crypto_types",
+      "relationshipType": "DESCRIBES",
+      "spdxElementId": "SPDXRef-DOCUMENT"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-workflow-0.1.0",
+      "relationshipType": "GENERATED_FROM",
+      "spdxElementId": "SPDXRef-File-gestur_workflow"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-File-gestur_policy",
+      "relationshipType": "DESCRIBES",
+      "spdxElementId": "SPDXRef-DOCUMENT"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-File-gestur_api_types",
+      "relationshipType": "DESCRIBES",
+      "spdxElementId": "SPDXRef-DOCUMENT"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-events-0.1.0",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-gestur-0.1.0"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-File-gestur_workflow",
+      "relationshipType": "DESCRIBES",
+      "spdxElementId": "SPDXRef-DOCUMENT"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-File-gestur_core",
+      "relationshipType": "DESCRIBES",
+      "spdxElementId": "SPDXRef-DOCUMENT"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-policy-0.1.0",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-gestur-api-types-0.1.0"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-0.1.0",
+      "relationshipType": "GENERATED_FROM",
+      "spdxElementId": "SPDXRef-File-gestur"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-File-gestur_testkit",
+      "relationshipType": "DESCRIBES",
+      "spdxElementId": "SPDXRef-DOCUMENT"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-schema-0.1.0",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-gestur-workflow-0.1.0"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-policy-0.1.0",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-gestur-0.1.0"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-File-gestur_schema",
+      "relationshipType": "DESCRIBES",
+      "spdxElementId": "SPDXRef-DOCUMENT"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-schema-0.1.0",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-gestur-0.1.0"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-core-0.1.0",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-gestur-0.1.0"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-File-gestur_events",
+      "relationshipType": "DESCRIBES",
+      "spdxElementId": "SPDXRef-DOCUMENT"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-policy-0.1.0",
+      "relationshipType": "GENERATED_FROM",
+      "spdxElementId": "SPDXRef-File-gestur_policy"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-core-0.1.0",
+      "relationshipType": "DEPENDS_ON",
+      "spdxElementId": "SPDXRef-Package-gestur-testkit-0.1.0"
+    },
+    {
+      "relatedSpdxElement": "SPDXRef-Package-gestur-schema-0.1.0",
+      "relationshipType": "GENERATED_FROM",
+      "spdxElementId": "SPDXRef-File-gestur_schema"
+    }
+  ],
+  "spdxVersion": "SPDX-2.3"
+}

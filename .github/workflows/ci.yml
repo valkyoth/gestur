@@ -1,0 +1,95 @@
+name: Rust CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: "17 05 * * 1"
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  checks:
+    name: Policy, format, lint, test, and audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install pinned Rust toolchain
+        run: rustup show
+
+      - name: Install security and evidence tools
+        run: |
+          cargo install --locked cargo-deny --version 0.20.2
+          cargo install --locked cargo-audit --version 0.22.2
+          cargo install --locked cargo-sbom --version 0.10.0
+
+      - name: Run repository gate
+        run: scripts/checks.sh
+
+      - name: Check dependency policy
+        run: cargo deny check
+
+      - name: Check RustSec advisories
+        run: cargo audit
+
+      - name: Verify committed SBOM
+        run: scripts/generate-sbom.sh --check
+
+      - name: Check current stable pins
+        if: github.event_name == 'schedule'
+        run: scripts/check_latest_tools.sh
+
+  host-tests:
+    name: Host test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - name: Test workspace
+        run: cargo test --workspace --all-features
+
+  portable-checks:
+    name: Portable check (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-freebsd
+          - os: ubuntu-latest
+            target: aarch64-linux-android
+          - os: macos-latest
+            target: aarch64-apple-ios
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install target
+        run: rustup target add ${{ matrix.target }}
+      - name: Check no_std workspace
+        run: cargo check --workspace --all-features --target ${{ matrix.target }}

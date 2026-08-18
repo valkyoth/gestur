@@ -1,0 +1,36 @@
+# Gestur admits no third-party crates. This file also fails closed if one is
+# proposed before the dependency-admission policy is deliberately changed.
+
+[graph]
+all-features = true
+
+[licenses]
+confidence-threshold = 0.95
+include-dev = true
+include-build = true
+unused-allowed-license = "allow"
+unused-license-exception = "deny"
+allow = ["EUPL-1.2"]
+
+[licenses.private]
+ignore = true
+
+[bans]
+multiple-versions = "deny"
+wildcards = "deny"
+highlight = "all"
+
+[advisories]
+db-path = ".cargo-deny-advisory-dbs"
+yanked = "deny"
+unmaintained = "all"
+unsound = "all"
+unused-ignored-advisory = "deny"
+ignore = []
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+required-git-spec = "rev"
+allow-registry = []
+allow-git = []
