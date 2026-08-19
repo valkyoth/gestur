@@ -1,7 +1,7 @@
 # Gestur 0.1.0 Release Notes
 
-Status: implementation complete; owner-operated pentest with third-party
-security tools required before tagging
+Status: release candidate; implementation and owner pentest/retest complete;
+tagging requires green GitHub CI and CodeQL on the exact final commit
 
 ## Summary
 

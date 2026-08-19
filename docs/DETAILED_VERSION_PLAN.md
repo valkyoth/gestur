@@ -1,7 +1,7 @@
 # Gestur Detailed Version Plan
 
-Status: planning document; v0.1.0 foundation implemented, owner-operated
-pentest with third-party security tools pending
+Status: planning document; v0.1.0 foundation and owner pentest/retest complete;
+tagging requires green GitHub CI and CodeQL on the exact final commit
 
 Production target: v1.0.0
 

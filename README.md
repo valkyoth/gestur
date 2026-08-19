@@ -36,6 +36,10 @@ no_std domain crates and repository gates. It is not yet a deployable visitor
 management system and makes no production, compliance, or security-certification
 claim.
 
+The v0.1.0 implementation has passed its owner-operated pentest/retest. It is
+not a release until the exact finalization commit passes GitHub CI and CodeQL
+and receives the matching annotated tag.
+
 Gestur is licensed under the European Union Public Licence 1.2. Every package
 is private and has Cargo publishing disabled. No Gestur crate may be published
 to crates.io before a separately approved public SDK policy change.

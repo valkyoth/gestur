@@ -1,7 +1,7 @@
 # Gestur Release Plan To 1.0
 
-Status: planning document; v0.1.0 implementation complete and awaiting an
-owner-operated pentest with third-party security tools
+Status: planning document; v0.1.0 implementation and owner pentest/retest are
+complete; tagging requires green GitHub CI and CodeQL on the exact final commit
 
 This plan is intentionally granular. Every milestone must remain small enough to
 implement, review, test, document, pentest, and stop cleanly. Split a milestone
@@ -227,8 +227,8 @@ Their full deliverables and mandatory proof live in the detailed register.
 
 ## v0.1.0 — Workspace genesis
 
-Status: Implemented; owner-operated pentest with third-party security tools
-pending.
+Status: Implementation and owner pentest/retest complete; tagging requires
+green GitHub CI and CodeQL on the exact final commit.
 
 Goal:
 

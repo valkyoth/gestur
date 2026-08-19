@@ -4,6 +4,8 @@ All notable Gestur changes are documented here.
 
 ## Unreleased
 
+## 0.1.0
+
 - Closed the v0.1.0 implementation gaps: request-ID test sequences now fail
   closed on exhaustion, schema keys/purposes reject ambiguous or oversized
   input, and facade tests cover both boundaries.
