@@ -128,6 +128,11 @@ a hand-written substitute for a mature security protocol. Admitting any future
 dependency requires an explicit policy change, threat/dependency review, source
 and license evidence, containment here, and maintainer approval.
 
+The `v0.10.2` feasibility ledger must resolve each planned boundary before its
+adapter crate is created. Resolution means either a safe first-party, platform,
+or isolated-process mechanism with an owned test environment, or an explicit
+blocked state. The ledger is not a dependency-admission shortcut.
+
 Vendor libraries that require a DLL, JVM, privileged daemon, or proprietary
 runtime run out of process in a gestur-vendor-agent. They never link into the
 central API process.

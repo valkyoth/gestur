@@ -99,7 +99,11 @@ Establish reproducible CI, canonical nonzero identifiers and time, stable error
 codes, deterministic encoding, bounded values, command/event envelopes,
 algorithm-agile key-provider contracts, no_std gates, validated configuration,
 redaction-aware observability contracts, zero-dependency enforcement,
-deterministic test support, and threat model v1.
+deterministic test support, threat model v1, and a production-boundary
+feasibility/blocker ledger. Before Phase 2 adapters, SQLite, PostgreSQL, MySQL,
+TLS, OIDC, WebAuthn, Unicode security, PKCS#11, and Wasm must each have a safe
+reviewable path under current policy plus a real test environment, or their
+implementation milestones remain blocked and unreachable.
 
 Verification emphasizes workspace metadata, all-target builds, strict Clippy,
 unit tests, doc links, source-size limits, publish prohibition, action pins,

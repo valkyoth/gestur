@@ -4,6 +4,10 @@ All notable Gestur changes are documented here.
 
 ## Unreleased
 
+- Corrected major-zero release-train chronology, expanded every grouped roadmap
+  range into unique ordered versions, split remaining multi-deliverable stops,
+  and added tested fail-closed validation for stop ownership, ordering,
+  dependencies, proof obligations, and regulatory source locks.
 - Strengthened the implementation, crate, and release plans with a
   dependency-correct patch-version register, explicit real-system evidence,
   optional hardware/regulatory gates, and a v1.0 acceptance ledger.

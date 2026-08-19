@@ -100,6 +100,9 @@ or creates a tag.
 - AI is optional and advisory; disabling it cannot break authoritative flows.
 - Every milestone is testable, documented, pentestable, and stops before tag
   creation.
+- Release trains open at `v0.N.0` and advance through exact, numerically ordered
+  patch stops; the detailed stop register and critical dependencies are
+  machine-validated.
 - Every behavior has unit and boundary tests. Support claims additionally
   require real-system or acceptance tests; mock-only evidence is insufficient.
 

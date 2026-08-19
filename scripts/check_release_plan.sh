@@ -25,3 +25,4 @@ while [ "$number" -le 200 ]; do
 done
 
 grep -q '^## v1\.0\.0 — Serious production release$' "$plan"
+python3 scripts/validate_detailed_version_plan.py --plan docs/DETAILED_VERSION_PLAN.md --release-plan "$plan"

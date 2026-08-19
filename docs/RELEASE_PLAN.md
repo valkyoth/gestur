@@ -15,8 +15,8 @@ this document.
 
 Tags use:
 
-    v0.N.0      capability milestone
-    v0.N.P      compatibility-preserving fix or hardening release
+    v0.N.0      release-train opening contract
+    v0.N.P      next bounded train increment during major-zero development
     v0.200.P    release-candidate fixes only
     v1.0.0      first serious production release
 
@@ -24,12 +24,17 @@ No tag or workflow publishes a Cargo package.
 
 ## Roadmap Authority And Change Control
 
-- A base milestone cannot close until every detailed stop assigned to it has
-  closed in version order.
+- A base `v0.N.0` closes only its train-opening contract and, if tagged, must
+  precede `v0.N.1`. The train's complete capability claim cannot close until
+  every required patch stop has closed in numeric order.
 - Each stop has one outcome, context explaining why it exists, mandatory proof,
   an evidence index entry, and the exact-commit pentest/retest stop below.
 - New work is inserted as the next free patch version under the owning base
   milestone. Published version numbers are never reused or silently redefined.
+- Every v0 patch release states its compatibility impact explicitly. Gestur is
+  in Semantic Versioning major-zero development; from v1.0.0 onward, fixes,
+  compatible features, and breaking changes use patch, minor, and major
+  increments respectively.
 - A changed trust boundary reruns all affected cumulative campaigns even when
   its local tests pass.
 - The implementation plan controls architectural dependency direction; the
@@ -59,6 +64,12 @@ otherwise require hand-written cryptography, TLS, OIDC, SQL, Unicode security,
 or a Wasm runtime remains blocked until maintainers explicitly change the
 dependency policy. “Planned” never means permission to implement an unsafe
 substitute.
+
+Before the first production adapter, `v0.10.2` must record a safe,
+independently reviewable first-party/platform/process path and real test
+environment for every mature protocol/runtime boundary, or mark its later stops
+blocked and unreachable. This feasibility gate does not itself authorize a
+dependency or weaken the zero-third-party rule.
 
 ## Release Principles
 
