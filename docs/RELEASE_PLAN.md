@@ -254,35 +254,41 @@ infrastructure implementation.
 
 Deliverables:
 
-- Define and implement the smallest stable domain, contract, adapter, UI, or
-  operational surface needed for workspace genesis.
-- Keep tenant, site, actor, purpose, classification, revision, idempotency,
-  resource bounds, and failure behavior explicit wherever they apply.
-- Add focused positive, negative, boundary, replay/retry, cross-tenant,
-  degraded-mode, and misuse tests appropriate to this capability.
-- Update architecture/security/privacy documentation, the threat model,
-  changelog, and release notes; state unsupported behavior and non-claims.
-- Add or tighten a dedicated crate/module boundary and test seam when the
-  capability would otherwise enlarge an existing responsibility.
+- Pin Rust 1.97.1 with edition 2024 and resolver 3 in one locked EUPL-1.2
+  workspace whose packages are unpublishable.
+- Establish the `gestur` facade plus eight focused, third-party-free no_std
+  domain/support crates without a deployable service or infrastructure claim.
+- Enforce the exact allowed crate graph, no_std and unsafe-code posture,
+  500-line source ceiling, first-party-only dependencies, and publish denial.
+- Make the existing bounded schema seam reject noncanonical keys, surrounding
+  whitespace, control text, and oversize input; make deterministic request IDs
+  fail closed instead of repeating after exhaustion.
+- Add unit, cross-crate boundary, policy-mutation, metadata, documentation,
+  security, SBOM, and host/portable CI checks for the implemented foundation.
+- Document architecture, testing, security, privacy, platform, dependency,
+  release, pentest, and explicit non-production boundaries.
 
 Verification:
 
-- Run the complete mandatory repository and release verification defined above.
-- Demonstrate workspace genesis through deterministic tests or recorded
-  operational/conformance evidence; no production service may be the only test
-  oracle.
-- Prove failure is closed, attributable, bounded, and free of duplicate
-  authoritative side effects for the release-specific trust boundaries.
-- Review every affected platform and no_std boundary and record any deliberate
-  limitation in the release notes.
+- Run `scripts/checks.sh`, `scripts/check_latest_tools.sh`, `cargo deny check`,
+  `cargo audit`, and committed SBOM comparison.
+- Exercise every active crate through unit tests and the external facade
+  integration suite, including schema-boundary rejection and request-ID
+  exhaustion without reuse.
+- Mutation-test crate dependency reversal, missing no_std posture, oversized
+  source, publish escape, and registry/Git/target-specific dependency escape.
+- Run host tests on Linux, Windows, and macOS plus no_std compile checks for
+  FreeBSD, Android, and iOS in CI; retain those as portability, not runtime
+  support, claims.
 
 Exit criteria:
 
-- The stated capability and adversarial tests pass, documentation matches
-  behavior, no unresolved high-impact finding or hidden dependency remains,
-  and the release can stop without unfinished migration or compatibility work.
-- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
-  is fixed and cleanly retested before permanent PASS evidence or a tag.
+- The workspace graph and all package metadata match the documented foundation;
+  every current behavior has unit and assembled-boundary evidence, policy
+  escapes fail closed, and unsupported product behavior remains unreachable.
+- Owner-operated pentesting with third-party security tools covers the exact
+  implementation commit; every finding is fixed and cleanly retested before
+  permanent PASS evidence or a tag.
 - v0.1.0 implementation stop reached. Run pentest for this exact commit.
 
 ## v0.2.0 — Reproducible CI

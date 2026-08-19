@@ -76,6 +76,10 @@ credential while still preserving emergency occupancy and controlled checkout.
 - Privacy-preserving host discovery and enumeration resistance.
 - Separation of PII, visit history, diagnostic logs, legal evidence, and audit.
 - Application-generated identifiers and explicit event sequences.
+- Deterministic request-ID fixtures fail closed at exhaustion rather than
+  silently repeating an idempotency identity.
+- Foundation schema keys use one bounded ASCII canonical form; purposes reject
+  control text and ambiguous surrounding whitespace.
 - Transactional outbox/inbox and idempotency for external effects.
 - Automatic credential expiry/revocation and reconciliation.
 - Webhook destination validation against SSRF and replay.

@@ -7,6 +7,7 @@ use gestur::events::{EventKind, VisitEvent};
 use gestur::policy::Capability;
 use gestur::schema::{DataClassification, FieldDefinition, FieldKind};
 use gestur::workflow::{NodeId, Transition};
+use gestur_testkit::{RequestIdSequence, RequestIdSequenceError};
 
 #[test]
 fn guest_journey_input_keeps_security_and_privacy_context() {
@@ -72,4 +73,33 @@ fn invalid_crypto_metadata_is_rejected_at_the_facade_boundary() {
         DigestReference::new(AlgorithmProfile::Sha3_512, &[0_u8; 32]),
         Err(CryptoTypeError::InvalidDigestLength)
     );
+}
+
+#[test]
+fn foundation_boundaries_fail_closed_on_ambiguous_input_and_id_exhaustion() {
+    let tenant_id = TenantId::from_u128(31);
+    assert!(matches!(
+        FieldDefinition::new(
+            tenant_id,
+            "Visitor Email",
+            "invitation delivery",
+            FieldKind::Email,
+            DataClassification::Personal,
+        ),
+        Err(gestur::schema::SchemaError::InvalidKey)
+    ));
+    assert!(matches!(
+        FieldDefinition::new(
+            tenant_id,
+            "visitor.email",
+            "invitation\ndelivery",
+            FieldKind::Email,
+            DataClassification::Personal,
+        ),
+        Err(gestur::schema::SchemaError::InvalidPurpose)
+    ));
+
+    let ids = RequestIdSequence::new(u128::MAX);
+    assert_eq!(ids.next().map(RequestId::as_u128), Ok(u128::MAX));
+    assert_eq!(ids.next(), Err(RequestIdSequenceError::Exhausted));
 }

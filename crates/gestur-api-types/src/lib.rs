@@ -39,24 +39,58 @@ pub enum ProblemCode {
 }
 
 /// A dependency-free problem description for later RFC 9457 adapters.
+///
+/// Version 0.1.0 only preserves this borrowed contract. Callers must not place
+/// secrets or personal data in `detail`; the disclosure-safe error mapping is
+/// introduced by its dedicated release milestone before any transport exists.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Problem<'a> {
     /// Stable machine-readable category.
     pub code: ProblemCode,
-    /// Safe human-readable explanation without secrets.
+    /// Caller-supplied human-readable explanation, which must be non-sensitive.
     pub detail: &'a str,
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{Problem, ProblemCode};
+    use gestur_core::{ActorId, RequestId, Revision, SiteId, TenantId};
+    use gestur_policy::Capability;
+
+    use super::{CommandContext, Problem, ProblemCode};
 
     #[test]
-    fn problem_has_stable_code_and_safe_detail() {
+    fn command_context_preserves_every_security_dimension() {
+        let revision = Revision::new(7);
+        let context = revision.map(|expected_revision| CommandContext {
+            tenant_id: TenantId::from_u128(1),
+            site_id: SiteId::from_u128(2),
+            actor_id: ActorId::from_u128(3),
+            request_id: RequestId::from_u128(4),
+            capability: Capability::GuestWifiRevoke,
+            expected_revision: Some(expected_revision),
+        });
+        assert_eq!(
+            context.map(|value| {
+                (
+                    value.tenant_id.as_u128(),
+                    value.site_id.as_u128(),
+                    value.actor_id.as_u128(),
+                    value.request_id.as_u128(),
+                    value.capability,
+                    value.expected_revision.map(Revision::get),
+                )
+            }),
+            Ok((1, 2, 3, 4, Capability::GuestWifiRevoke, Some(7)))
+        );
+    }
+
+    #[test]
+    fn problem_preserves_code_and_borrowed_detail() {
         let problem = Problem {
             code: ProblemCode::Forbidden,
             detail: "requested capability is not granted",
         };
         assert_eq!(problem.code, ProblemCode::Forbidden);
+        assert_eq!(problem.detail, "requested capability is not granted");
     }
 }

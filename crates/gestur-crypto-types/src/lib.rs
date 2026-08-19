@@ -68,8 +68,17 @@ mod tests {
         );
         assert_eq!(
             DigestReference::new(AlgorithmProfile::Sha3_256, &[0_u8; 32])
-                .map(|digest| digest.bytes().len()),
-            Ok(32)
+                .map(|digest| (digest.profile(), digest.bytes().len())),
+            Ok((AlgorithmProfile::Sha3_256, 32))
+        );
+        assert_eq!(
+            DigestReference::new(AlgorithmProfile::Sha3_512, &[0_u8; 64])
+                .map(|digest| (digest.profile(), digest.bytes().len())),
+            Ok((AlgorithmProfile::Sha3_512, 64))
+        );
+        assert_eq!(
+            DigestReference::new(AlgorithmProfile::Sha3_512, &[0_u8; 65]),
+            Err(CryptoTypeError::InvalidDigestLength)
         );
     }
 }

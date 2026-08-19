@@ -50,8 +50,8 @@ impl<'a> FieldDefinition<'a> {
         kind: FieldKind,
         classification: DataClassification,
     ) -> Result<Self, SchemaError> {
-        validate_text(key, SchemaError::InvalidKey)?;
-        validate_text(purpose, SchemaError::InvalidPurpose)?;
+        validate_key(key)?;
+        validate_purpose(purpose)?;
         Ok(Self {
             tenant_id,
             key,
@@ -92,9 +92,26 @@ impl<'a> FieldDefinition<'a> {
     }
 }
 
-fn validate_text(value: &str, error: SchemaError) -> Result<(), SchemaError> {
-    if value.is_empty() || value.len() > 128 {
-        Err(error)
+fn validate_key(value: &str) -> Result<(), SchemaError> {
+    let mut bytes = value.bytes();
+    let valid_first = bytes.next().is_some_and(|byte| byte.is_ascii_lowercase());
+    let valid_rest = bytes.all(|byte| {
+        byte.is_ascii_lowercase() || byte.is_ascii_digit() || matches!(byte, b'.' | b'_' | b'-')
+    });
+    if value.len() <= 128 && valid_first && valid_rest {
+        Ok(())
+    } else {
+        Err(SchemaError::InvalidKey)
+    }
+}
+
+fn validate_purpose(value: &str) -> Result<(), SchemaError> {
+    if value.is_empty()
+        || value.len() > 128
+        || value.trim() != value
+        || value.chars().any(char::is_control)
+    {
+        Err(SchemaError::InvalidPurpose)
     } else {
         Ok(())
     }
@@ -138,6 +155,54 @@ mod tests {
             ),
             Err(SchemaError::InvalidPurpose)
         );
+    }
+
+    #[test]
+    fn field_key_is_canonical_and_bounded() {
+        let tenant = TenantId::from_u128(1);
+        let create = |key| {
+            FieldDefinition::new(
+                tenant,
+                key,
+                "host notification",
+                FieldKind::Text,
+                DataClassification::Personal,
+            )
+        };
+        assert!(create("visitor.email_2-primary").is_ok());
+        assert_eq!(create("Visitor.Email"), Err(SchemaError::InvalidKey));
+        assert_eq!(create(".visitor"), Err(SchemaError::InvalidKey));
+        assert_eq!(create("visitor email"), Err(SchemaError::InvalidKey));
+        let maximum = "a".repeat(128);
+        let oversized = "a".repeat(129);
+        assert!(create(&maximum).is_ok());
+        assert_eq!(create(&oversized), Err(SchemaError::InvalidKey));
+    }
+
+    #[test]
+    fn purpose_rejects_ambiguous_or_control_text() {
+        let tenant = TenantId::from_u128(1);
+        let create = |purpose| {
+            FieldDefinition::new(
+                tenant,
+                "visitor.email",
+                purpose,
+                FieldKind::Text,
+                DataClassification::Personal,
+            )
+        };
+        assert_eq!(
+            create(" host notification"),
+            Err(SchemaError::InvalidPurpose)
+        );
+        assert_eq!(
+            create("host\nnotification"),
+            Err(SchemaError::InvalidPurpose)
+        );
+        let maximum = "a".repeat(128);
+        let oversized = "a".repeat(129);
+        assert!(create(&maximum).is_ok());
+        assert_eq!(create(&oversized), Err(SchemaError::InvalidPurpose));
     }
 
     #[test]

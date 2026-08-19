@@ -31,7 +31,7 @@ reception desk, yet architected for multi-site deployments, local hardware,
 offline operation, replaceable integrations, multiple database backends, and
 defensible privacy and audit evidence.
 
-The repository is at the v0.1.0 foundation. It contains dependency-free,
+The repository is at the v0.1.0 foundation. It contains third-party-free,
 no_std domain crates and repository gates. It is not yet a deployable visitor
 management system and makes no production, compliance, or security-certification
 claim.
@@ -45,11 +45,11 @@ to crates.io before a separately approved public SDK policy change.
 | Capability | Status | Notes |
 | --- | --- | --- |
 | Rust workspace | Active | Rust 1.97.1, edition 2024, resolver 3. |
-| Focused crate boundaries | Active | The facade composes eight small domain/support crates. |
+| Focused crate boundaries | Active | The facade composes eight small domain/support crates; the exact graph is mutation-tested. |
 | no_std domain | Active | Every current Rust crate builds without std. |
 | Third-party crates | None | Only workspace path dependencies exist. |
 | Publish prevention | Active | Manifest inheritance and policy scripts fail closed. |
-| Security baseline | Active | Threat model, supply-chain policy, CI, audit, SBOM, and pentest stop rules. |
+| Security baseline | Active | Threat model, fail-closed bounded inputs/test IDs, supply-chain policy, CI, audit, SBOM, and pentest stop rules. |
 | Platform posture | Active | Host CI for Linux, Windows, and macOS; compile gates for BSD, Android, and iOS. |
 | Deployable server/UI/edge | Planned | Added incrementally by the release plan. |
 | Aesynx support | Prepared | Portable core avoids OS assumptions; no current Aesynx target claim. |

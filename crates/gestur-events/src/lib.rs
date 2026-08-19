@@ -62,6 +62,19 @@ mod tests {
                 kind: EventKind::VisitorArrived,
             })
         });
-        assert_eq!(event.map(|value| value.actor_id.as_u128()), Ok(4));
+        assert_eq!(
+            event.map(|value| {
+                (
+                    value.event_id.as_u128(),
+                    value.tenant_id.as_u128(),
+                    value.visit_id.as_u128(),
+                    value.sequence.get(),
+                    value.actor_id.as_u128(),
+                    value.occurred_at.get(),
+                    value.kind,
+                )
+            }),
+            Ok((1, 2, 3, 1, 4, 10, EventKind::VisitorArrived))
+        );
     }
 }

@@ -102,24 +102,35 @@ pub enum CoreError {
 
 #[cfg(test)]
 mod tests {
-    use super::{CoreError, Revision, TenantId, UnixMillis};
+    use super::{
+        ActorId, CoreError, EventId, RequestId, Revision, SiteId, TenantId, UnixMillis, VisitId,
+    };
 
     #[test]
     fn identifiers_round_trip() {
-        let id = TenantId::from_u128(42);
-        assert_eq!(id.as_u128(), 42);
-        assert_eq!(std::format!("{id}"), "42");
+        assert_eq!(TenantId::from_u128(1).as_u128(), 1);
+        assert_eq!(SiteId::from_u128(2).as_u128(), 2);
+        assert_eq!(VisitId::from_u128(3).as_u128(), 3);
+        assert_eq!(ActorId::from_u128(4).as_u128(), 4);
+        assert_eq!(RequestId::from_u128(5).as_u128(), 5);
+        assert_eq!(EventId::from_u128(u128::MAX).as_u128(), u128::MAX);
+        assert_eq!(
+            std::format!("{}", EventId::from_u128(u128::MAX)),
+            "340282366920938463463374607431768211455"
+        );
     }
 
     #[test]
     fn timestamps_reject_pre_epoch_values() {
         assert_eq!(UnixMillis::new(-1), Err(CoreError::BeforeUnixEpoch));
         assert_eq!(UnixMillis::new(0).map(UnixMillis::get), Ok(0));
+        assert_eq!(UnixMillis::new(i64::MAX).map(UnixMillis::get), Ok(i64::MAX));
     }
 
     #[test]
     fn revisions_are_strictly_positive() {
         assert_eq!(Revision::new(0), Err(CoreError::ZeroRevision));
         assert_eq!(Revision::new(1).map(Revision::get), Ok(1));
+        assert_eq!(Revision::new(u64::MAX).map(Revision::get), Ok(u64::MAX));
     }
 }

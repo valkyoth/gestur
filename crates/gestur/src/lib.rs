@@ -28,6 +28,6 @@ mod tests {
     #[test]
     fn facade_and_testkit_compose_without_external_crates() {
         let ids = RequestIdSequence::new(10);
-        assert_eq!(ids.next().as_u128(), 10);
+        assert_eq!(ids.next().map(|id| id.as_u128()), Ok(10));
     }
 }

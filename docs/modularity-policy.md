@@ -17,5 +17,7 @@ itself.
 - A generated file needs identified input, generator version, reproducibility
   checks, and an explicit exception from the normal source-size policy.
 
-scripts/validate-modularity-policy.sh enforces the current crate set, no_std
-attributes, unsafe prohibition, and code-file size limit.
+`scripts/validate-modularity-policy.sh` enforces the exact active crate graph,
+no_std attributes, unsafe prohibition, and code-file size limit. Its mutation
+suite proves reverse dependencies, missing crates/attributes, and oversized
+sources fail closed.

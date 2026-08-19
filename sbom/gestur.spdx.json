@@ -203,7 +203,7 @@
     },
     {
       "SPDXID": "SPDXRef-Package-gestur-testkit-0.1.0",
-      "description": "Deterministic, dependency-free test helpers for Gestur.",
+      "description": "Deterministic, third-party-free test helpers for Gestur.",
       "downloadLocation": "NONE",
       "licenseConcluded": "EUPL-1.2",
       "licenseDeclared": "EUPL-1.2",

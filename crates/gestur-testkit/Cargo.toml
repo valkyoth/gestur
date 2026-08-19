@@ -1,6 +1,6 @@
 [package]
 name = "gestur-testkit"
-description = "Deterministic, dependency-free test helpers for Gestur."
+description = "Deterministic, third-party-free test helpers for Gestur."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

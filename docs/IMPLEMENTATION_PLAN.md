@@ -41,12 +41,14 @@ site edge and isolated native vendor agent.
   and actual supported implementations must also be exercised.
 - Documentation, release notes, threat changes, and pentest evidence are part
   of the implementation.
-- No release tag before an independent exact-commit pentest and clean retest.
+- No release tag before an owner-operated exact-commit pentest with third-party
+  security tools and a direct PASS or clean retest.
 - Release reviewer and tag-signer keys are separate roles; candidate registry
   changes cannot take effect without an externally protected digest update and
   two-person governance.
-- Pentest results follow the owner-confirmed finding/retest loop. Later CodeQL
-  fixes are documented, fully retested, and rechecked by CodeQL before tagging.
+- Pentest results follow the owner-confirmed finding/retest loop with exact tool
+  versions and configuration. Later CodeQL fixes use the structured delta
+  record, are fully retested, and are rechecked by CodeQL before tagging.
 
 ## Architectural Decisions To Freeze
 

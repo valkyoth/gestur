@@ -10,6 +10,10 @@ Status: v0.1.0 foundation controls.
 - publish = false resolved for every Cargo package.
 - no_std and forbid(unsafe_code) in every active crate.
 - Strict compiler/Clippy lints and a 500-line code-file gate.
+- Exact active-crate dependency graph with adversarial reversal, missing-crate,
+  attribute-removal, and oversized-source tests.
+- Deterministic test request IDs refuse reuse after numeric exhaustion; schema
+  keys and purposes reject ambiguous, control, and oversized input.
 - Unit, doc, policy, release-plan, metadata, and cross-target checks.
 - Mandatory unit, assembled-boundary, real-system/acceptance, and adversarial
   evidence appropriate to every capability claim.

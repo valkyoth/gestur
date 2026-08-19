@@ -73,8 +73,8 @@ Tests never use production credentials or real visitor PII.
 
 Security-sensitive and production-facing milestones add fuzzing, property or
 model testing, concurrency testing, deterministic fault injection, chaos,
-load/soak, migration, backup/restore, upgrade/rollback, and independent
-pentesting as applicable.
+load/soak, migration, backup/restore, upgrade/rollback, and owner-operated
+pentesting with third-party security tools as applicable.
 
 Pentesting complements these layers and does not replace them.
 

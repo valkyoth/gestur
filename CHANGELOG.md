@@ -4,6 +4,12 @@ All notable Gestur changes are documented here.
 
 ## Unreleased
 
+- Closed the v0.1.0 implementation gaps: request-ID test sequences now fail
+  closed on exhaustion, schema keys/purposes reject ambiguous or oversized
+  input, and facade tests cover both boundaries.
+- Added mutation-tested enforcement for the exact crate dependency graph,
+  no_std/unsafe/source-size posture, package publication denial, and registry,
+  Git, build, and target-specific dependency escapes.
 - Added externally pinned reviewer/tag-signer trust, an owner-driven
   pentest/retest and CodeQL-remediation record, authorized tag fingerprints, and
   protected current-tag validation with adversarial real-Git/GPG tests.
@@ -27,7 +33,7 @@ All notable Gestur changes are documented here.
   real-system/acceptance, and adversarial layers and no mock-only support claims.
 - Added cross-crate facade integration tests and an executable test-policy gate.
 - Initialized the Rust 1.97.1, edition 2024 workspace.
-- Added dependency-free no_std domain, policy, workflow, event, API, crypto
+- Added third-party-free no_std domain, policy, workflow, event, API, crypto
   metadata, testkit, and facade crates.
 - Added strict unpublished-package, zero-third-party-dependency, 500-line,
   unsafe-code, and no_std gates.
