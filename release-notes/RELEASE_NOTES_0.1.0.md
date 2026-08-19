@@ -40,6 +40,9 @@ no_std workspace foundation. It is not a usable visitor management release.
 - An owner-driven pentest/retest record that preserves the green pentested
   commit and its tool versions/configuration, and machine-verifies any later
   CodeQL remediation before protected tag checks.
+- Release-evidence validation that treats renames as deletion/addition pairs,
+  preventing implementation removal from being disguised as an allowed
+  evidence-only change.
 - Linux, Windows, macOS, BSD, Android, and iOS verification posture.
 - A 500-line Rust source limit and no_std/unsafe/publishing/dependency gates.
 - Mutation tests proving crate-graph reversal, lost no_std posture, oversized

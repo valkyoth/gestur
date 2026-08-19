@@ -114,6 +114,28 @@ class ReleaseEvidenceValidatorTests(unittest.TestCase):
             errors = validate(fixture, "v0.1.0", candidate, declared)
         self.assert_error(errors, "evidence commit changes unauthorized paths")
 
+    def test_renamed_source_into_evidence_path_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = GitFixture(Path(directory))
+            fixture.write(
+                "crates/security-critical.rs", "Primary-source review details\n"
+            )
+            candidate = fixture.commit("candidate with security-critical source")
+            (fixture.root / "evidence/source-freshness/reviews").mkdir(
+                parents=True, exist_ok=True
+            )
+            fixture.run(
+                "mv",
+                "crates/security-critical.rs",
+                "evidence/source-freshness/reviews/v0.1.0.md",
+            )
+            write_source_evidence(fixture, "v0.1.0", candidate)
+            fixture.commit("evidence with disguised source deletion")
+
+            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
+
+        self.assert_error(errors, "crates/security-critical.rs")
+
     def test_dirty_worktree_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             fixture, candidate, declared = self.make_source_release(Path(directory))

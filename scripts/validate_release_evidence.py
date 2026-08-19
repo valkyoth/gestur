@@ -446,7 +446,18 @@ def validate_release_evidence(
         allowed_paths,
     )
 
-    changed_output = git_output(root, "diff", "--name-only", candidate_commit, "HEAD")
+    # Treat renames as a deletion plus an addition so moving implementation into an
+    # allowed evidence path cannot hide the removal of an unauthorized source path.
+    changed_output = git_output(
+        root,
+        "diff",
+        "--no-ext-diff",
+        "--no-renames",
+        "--name-only",
+        candidate_commit,
+        "HEAD",
+        "--",
+    )
     changed = set() if not changed_output else set(changed_output.splitlines())
     required = {f"security/pentest/{release}.md"} | {
         path for path in allowed_paths if path.startswith("evidence/source-freshness/")
