@@ -13,7 +13,6 @@ from pathlib import Path
 POLICY_DIGEST_ENV = "GESTUR_RELEASE_TRUST_POLICY_SHA256"
 REGISTRIES = {
     "reviewer": "security/release-reviewers.txt",
-    "pentester": "security/external-pentesters.txt",
     "tag-signer": "security/release-tag-signers.txt",
 }
 FINGERPRINT_RE = re.compile(r"^[0-9A-F]{40}(?:[0-9A-F]{24})?$")
@@ -64,7 +63,7 @@ def registry_entries(
 
 
 def trust_policy_digest(repository: Path, revision: str) -> str | None:
-    digest = hashlib.sha256(b"gestur-release-trust-policy-v1\0")
+    digest = hashlib.sha256(b"gestur-release-trust-policy-v2\0")
     for role, relative in REGISTRIES.items():
         raw = git_blob(repository, revision, relative)
         if raw is None:

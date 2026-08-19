@@ -15,7 +15,6 @@ test -f docs/supply-chain-security.md
 test -f docs/unsafe-policy.md
 test -f docs/github-security-settings.md
 test -f security/release-reviewers.txt
-test -f security/external-pentesters.txt
 test -f security/release-tag-signers.txt
 test -f security/release-trust-keyring.asc
 test -f docs/release-trust-governance.md

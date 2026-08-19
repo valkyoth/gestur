@@ -5,14 +5,13 @@ Status: fail-closed bootstrap policy; no release identity is authorized yet.
 ## Trust Boundary
 
 Git content can describe release identities but cannot authorize itself. Gestur
-separates three OpenPGP roles:
+separates two OpenPGP roles:
 
 - `security/release-reviewers.txt` signs source and feasibility review records;
-- `security/external-pentesters.txt` signs independent pentest attestations;
 - `security/release-tag-signers.txt` signs annotated release tags.
 
 One fingerprint or identity must not cross roles. The validator hashes the exact
-candidate versions of all three registries with domain and length separation.
+candidate versions of both registries with domain and length separation.
 Every release compares that digest with the externally stored
 `GESTUR_RELEASE_TRUST_POLICY_SHA256`. Missing, malformed, stale, or mismatched
 external state blocks release.
@@ -24,7 +23,7 @@ or GitHub Actions.
 
 ## Bootstrap And Change Procedure
 
-1. Nominate distinct real people for the needed roles and verify their key
+1. Nominate distinct real people for the two signing roles and verify their key
    fingerprints through an independent channel.
 2. Add public keys and exact identity/fingerprint registry entries in one pull
    request. Record the reason, effective releases, expiry/rotation plan, and
@@ -54,8 +53,8 @@ releases blocked.
 - Add a replacement key and update the external digest before first use.
 - Retain historical authorized tag fingerprints while supported predecessor
   tags depend on them; removal requires an explicit history-verification design.
-- Remove compromised reviewer or pentester authority immediately, rotate the
-  external pin, and invalidate affected unsigned/untrusted evidence.
+- Remove compromised reviewer authority immediately, rotate the external pin,
+  and invalidate affected signed review evidence.
 - A compromised tag key triggers the security incident process. Freeze release
   activity, preserve refs and logs, assess every affected tag, and publish a
   signed incident decision before resuming. Never silently retarget a tag.

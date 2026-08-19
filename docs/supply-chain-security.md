@@ -19,10 +19,12 @@ source policy, tool pins, action SHA pins, and SBOM still form release evidence.
   signed annotated tag from an externally pinned authorized fingerprint in
   strict Git ancestry order.
 - Freeze the candidate, then permit one evidence-only child commit whose signed
-  source/feasibility reviews and signed, digest-bound pentest evidence bind that
-  candidate.
-- Keep reviewer, external-pentester, and tag-signer roles separate; bind their
-  candidate registries to a protected digest outside Git.
+  source/feasibility reviews and owner-confirmed pentest record bind that
+  candidate and identify the commit actually pentested.
+- Keep reviewer and tag-signer roles separate; bind their candidate registries
+  to a protected digest outside Git.
+- Record later CodeQL remediation without rewriting which commit received the
+  green pentest; rerun all local gates and CodeQL before tagging.
 - Validate the newly pushed tag's signer and exact evidence target in protected
   tag-triggered CI before treating it as a release.
 

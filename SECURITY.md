@@ -35,11 +35,12 @@ workflow while default setup is active. See
 
 Every version stops after implementation and local verification. A tag is
 forbidden until an independent pentest covers the exact implementation commit,
-all findings are fixed and retested, an externally authorized signature binds
-the exact candidate plus provider report/support digests under security/pentest,
-the protected role-policy digest matches, GitHub CI and CodeQL are green, and
-the maintainer explicitly requests the tag. A pushed tag is not a release until
-protected CI verifies its authorized signer and exact evidence-commit target.
+all findings are fixed and cleanly retested, the owner confirms PASS, and the
+permanent record under security/pentest names the commit actually tested. All
+local gates then rerun. Any later CodeQL remediation is recorded separately,
+fully retested, and must receive green CI/CodeQL before the maintainer requests
+the tag. A pushed tag is not a release until protected CI verifies its authorized
+signer and exact evidence-commit target.
 
 Root PENTEST.md is temporary private-to-worktree findings input and must never
 be committed.

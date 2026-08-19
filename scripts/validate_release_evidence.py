@@ -444,7 +444,6 @@ def validate_release_evidence(
         today or date.today(),
         errors,
         allowed_paths,
-        signature_verifier,
     )
 
     changed_output = git_output(root, "diff", "--name-only", candidate_commit, "HEAD")

@@ -4,7 +4,6 @@
 # external two-person controls in docs/release-trust-governance.md are required
 # before production; this routing entry cannot authorize a release by itself.
 /security/release-reviewers.txt @eldryoth
-/security/external-pentesters.txt @eldryoth
 /security/release-tag-signers.txt @eldryoth
 /security/release-trust-keyring.asc @eldryoth
 /.github/workflows/release-tag.yml @eldryoth

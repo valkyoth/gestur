@@ -23,9 +23,10 @@ For every row below:
   mock-only evidence cannot close a stop.
 - **Exit criteria:** behavior and documentation agree; failures are bounded,
   attributable, fail closed, and do not duplicate authoritative effects; no
-  hidden migration or compatibility work remains; the exact commit passes an
-  independent pentest, findings receive regression tests and a clean retest,
-  and only then may maintainers explicitly authorize a signed tag.
+  hidden migration or compatibility work remains; an implementation commit
+  receives a green pentest, findings receive regression tests and a clean
+  retest, all gates rerun, later CodeQL remediations are recorded and rechecked,
+  and only a final CodeQL-green commit may receive an authorized signed tag.
 
 A base `v0.N.0` release opens its train and closes only its own stated contract.
 Later `v0.N.P` releases follow in numeric order and never change the contents or
@@ -67,10 +68,10 @@ Accepted corrections:
   must form a distinct, signed, ancestor-ordered tag chain;
 - legal source sets retain the base instrument and each applicable amendment or
   authoritative consolidation instead of treating one amendment as the whole.
-- release reviewers, independent pentesters, and tag signers receive separate
-  key registries whose exact candidate-state digest is pinned outside Git;
-- pentest approval becomes a signed attestation over the exact candidate and
-  SHA-256-bound provider report and supporting artifact;
+- release reviewers and tag signers receive separate key registries whose exact
+  candidate-state digest is pinned outside Git;
+- the pentest record distinguishes the commit actually tested from any later
+  fully tested CodeQL remediation included in the release candidate;
 - predecessor and newly created tags must be signed by an authorized tag-role
   fingerprint, and the new tag receives its own protected CI validation.
 
@@ -96,8 +97,8 @@ Rejected or corrected:
   silently exempted.
 - Specialist cumulative reviews do not replace Gestur's independent
   exact-commit pentest and clean-retest requirement at every version.
-- Per-version pentesting remains mandatory. Provider capacity, specialist
-  coverage, retest lead time, and budget must be reserved before work is
+- Per-version pentesting remains mandatory. Owner pentest/retest time, tooling,
+  environment, scope, and contingency time must be reserved before work is
   scheduled; unavailable capacity blocks the train and never waives a test.
 - Dependency admission is not pre-approved. `v0.10.2` must prove a safe path
   under the current policy or keep the affected capability blocked; only a
@@ -124,16 +125,17 @@ Rejected or corrected:
     and signed feasibility artifacts authorized for its candidate.
 12. Release candidates are members of the declared base/stop set; every lower
     declared version has a distinct signed tag in strict ancestry order.
-13. Reviewer, external-pentester, and tag-signer keys are role-separated; the
-    candidate's canonical registry digest must match a protected external pin.
-14. The independent pentest attestation binds the exact candidate, tester,
-    scope, provider report digest, support digest, and detached signature.
+13. Reviewer and tag-signer keys are role-separated; the candidate's canonical
+    registry digest must match a protected external pin.
+14. The owner-confirmed pentest record names the green pentested commit and the
+    release candidate separately; later code is limited to documented CodeQL
+    remediation and receives the full local and CodeQL gates again.
 15. Both predecessor tags and the current tag require an authorized tag-signer
     fingerprint; the current tag must target the approved evidence-only commit.
 
 ## Machine-Enforced Release Trust Root
 
-The three role registries under `security/` are candidate inputs, not trust
+The reviewer and tag-signer registries under `security/` are candidate inputs, not trust
 anchors by themselves. Their domain-separated canonical SHA-256 digest must
 match `GESTUR_RELEASE_TRUST_POLICY_SHA256`, supplied outside Git by the protected
 `release-trust` GitHub environment (or an equivalently controlled local release
@@ -187,7 +189,7 @@ consumer.
 - v0.10.6 <- v0.10.5
 - v0.10.7 <- v0.10.5
 - v0.10.8 <- v0.10.5
-- v0.10.9 <- v0.10.5, v0.10.8
+- v0.10.9 <- v0.10.4
 - v0.10.10 <- v0.10.6, v0.10.8, v0.10.9
 - v0.12.1 <- v0.10.2, v0.11.1, v0.11.3, v0.11.5
 - v0.32.1 <- v0.3.6, v0.3.7, v0.11.5, v0.30.1
@@ -451,12 +453,12 @@ adding, or moving a stop requires an explicit reviewable declaration change.
 | v0.10.1 | Validate threat model v1 against abuse cases and control-to-test traceability. | Independent review maps each trust boundary and control to current or explicitly future evidence. |
 | v0.10.2 | Publish the production-boundary feasibility and blocker ledger under the zero-third-party rule. | SQLite, PostgreSQL, MySQL, TLS, OIDC, WebAuthn, Unicode security, PKCS#11, and Wasm each name a reviewable first-party/platform/process path plus real-test environment, or remain explicitly blocked and unreachable. |
 | v0.10.3 | Define the shared network destination and egress-safety contract before network clients. | DNS rebinding, CNAME, redirect, dual-stack, private/metadata address, proxy, TLS-name, timeout, and size fixtures define fail-closed behavior. |
-| v0.10.4 | Establish the per-version independent-pentest capacity plan without reducing scope or frequency. | Approved budget owner, provider and specialist coverage, booking lead times, clean-retest SLA, contingency capacity, and schedule gates cover every declared stop; absent capacity blocks scheduling. |
+| v0.10.4 | Establish the owner-run per-version pentest capacity plan without reducing scope or frequency. | Owner time, tooling, environment, scope, clean-retest availability, contingency capacity, and schedule gates cover every declared stop; absent capacity blocks scheduling. |
 | v0.10.5 | Define the cryptographically attributable review-evidence envelope used by feasibility and source gates. | Real temporary Git history and disposable reviewer key; nonexistent/non-ancestor commit, wrong scope, later scoped change, plan/support digest mutation, untrusted/ambiguous key, forged/wrong-key signature, merge evidence commit, and non-evidence changes all fail. |
 | v0.10.6 | Enforce the closed declared-release set and strict signed predecessor-tag ancestry. | Real temporary Git graph; undeclared release, missing/lightweight/unsigned/reused/out-of-order/non-ancestor predecessor tag, reused candidate commit, and pre-existing target tag fail; a complete signed chain passes. |
 | v0.10.7 | Define authoritative multi-instrument legal source sets and amendment/consolidation relationships. | Base act, applicable amendments, consolidation state, revision dates, precedence notes, freshness, and qualified applicability review are complete; missing-base and amendment-only fixtures fail. |
-| v0.10.8 | Establish a role-separated release trust policy anchored by a protected digest outside candidate-controlled Git history. | Real temporary Git history proves missing/malformed/mismatched pins, duplicate identities/fingerprints, cross-role key reuse, and candidate-only self-authorization fail; repository ruleset and `release-trust` environment evidence shows two distinct approvals, no self-review, and no administrator bypass. |
-| v0.10.9 | Replace field-only pentest acceptance with a signed external-pentester attestation over the exact candidate and digest-bound provider artifacts. | Real disposable external-pentester key and Git evidence commit; unsigned/forged/wrong-role attestation, fabricated tester, wrong candidate, mutated provider report, mutated support artifact, unsafe path, and non-PASS result all fail. |
+| v0.10.8 | Establish a role-separated reviewer/tag-signer trust policy anchored by a protected digest outside candidate-controlled Git history. | Real temporary Git history proves missing/malformed/mismatched pins, duplicate identities/fingerprints, cross-role key reuse, and candidate-only self-authorization fail; repository ruleset and `release-trust` environment evidence shows two distinct approvals, no self-review, and no administrator bypass. |
+| v0.10.9 | Make the owner-driven pentest, clean-retest, full-test, CodeQL-remediation, and final-green sequence explicit and machine-readable. | Real Git histories cover direct PASS, findings followed by clean retest, full-gate evidence, documented CodeQL-only follow-up changes, rejected unknown/non-ancestor pentest commits, rejected undocumented later code, and final CodeQL-green tag readiness. |
 | v0.10.10 | Authorize predecessor/current release tag fingerprints and validate every newly created tag against its approved evidence commit. | Real disposable OpenPGP keys and signed annotated tags; arbitrary valid key, missing/ambiguous authorization, wrong target, non-evidence target, altered evidence, lightweight/unsigned tag, and broken ancestry fail; protected tag-triggered CI passes the authorized complete chain. |
 
 Phase exit: canonical envelopes and crypto-provider contracts are independently
@@ -791,11 +793,11 @@ uses the next patch stop, and reruns affected cumulative campaigns.
 | v0.197.1 | Complete independent privacy/regulatory review. | Retention/hold/restriction/erasure/restore/processor evidence; LPR/AI/ID DPIAs where applicable. |
 | v0.197.2 | Complete export-control counsel review of the optional ITAR/EAR packs. | Exact sources/versions, authority boundaries, classifications, authorizations, anti-discrimination, non-claims, and customer responsibility. |
 | v0.197.3 | Complete sanctions counsel review of the optional screening pack. | Exact programs/lists/versions, activity nexus, match/disposition boundaries, anti-discrimination, non-claims, and customer responsibility. |
-| v0.198.1 | External exact-commit application/API/authn/storage/privacy/plugin pentest and clean retest. | All findings triaged; blockers fixed with regression tests; final report digest recorded. |
+| v0.198.1 | Owner-run exact-commit application/API/authn/storage/privacy/plugin pentest and clean retest. | All findings triaged; blockers fixed with regression tests; the permanent record names the green pentested commit and any later CodeQL delta. |
 | v0.198.2 | External edge/kiosk/hardware/Wasm/offline red-team and clean retest. | Physical kiosk, stolen edge, lateral movement, malicious component/device/protocol/update-chain scope. |
 | v0.198.3 | Independent cryptography/key/evidence design and implementation review. | Profiles, canonicalization, key lifecycle, erasure assumptions, signing/timestamp/verifier findings closed. |
 | v0.199.1 | Freeze API/event/WIT/config/bundle/storage compatibility and claims. | Golden compatibility suite, support/deprecation policy, every documentation claim linked to proof. |
-| v0.200.1 | Admit the first release-blocker-only candidate fix, if required. | Reproducer/regression, affected campaign rerun, pentest revalidation, and reproducible artifacts; later fixes increment v0.200.P one at a time. |
+| v0.200.1 | Admit the first release-blocker-only candidate fix, if required. | Reproducer/regression, affected campaign rerun, pentest-record update and owner-requested revalidation where needed, plus reproducible artifacts; later fixes increment v0.200.P one at a time. |
 | v1.0.0 | Promote the unchanged qualified candidate. | Explicit approval; green CI/CodeQL; clean reviews; signed tag/artifacts; rollback, incident, and on-call readiness. |
 
 <!-- detailed-stop-register:end -->

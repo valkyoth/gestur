@@ -29,11 +29,11 @@ no_std workspace foundation. It is not a usable visitor management release.
   signed predecessor-tag ancestry, self-asserted reviews, stale reviewed scopes,
   invalid support digests/signatures, and non-evidence changes after candidate
   freeze.
-- Role-separated reviewer, external-pentester, and tag-signer registries bound
-  to a protected digest outside Git, with candidate-only self-authorization and
-  cross-role key reuse rejected.
-- Signed pentest attestations over exact-candidate provider report/support
-  digests and protected post-tag signer/target/evidence validation.
+- Role-separated reviewer and tag-signer registries bound to a protected digest
+  outside Git, with candidate-only self-authorization and cross-role reuse
+  rejected.
+- An owner-driven pentest/retest record that preserves the green pentested
+  commit, documents later CodeQL remediation, and precedes protected tag checks.
 - Linux, Windows, macOS, BSD, Android, and iOS verification posture.
 - A 500-line Rust source limit and no_std/unsafe/publishing/dependency gates.
 
@@ -45,9 +45,9 @@ no_std workspace foundation. It is not a usable visitor management release.
 - Algorithm types are metadata only and must not be read as a cryptographic
   implementation claim.
 - A tag remains blocked until independent pentest findings are resolved and the
-  exact reviewed candidate has permanent externally authorized, signed,
-  digest-bound PASS evidence in its evidence-only child commit. The tag itself
-  must use an authorized fingerprint and pass its tag-triggered check.
+  owner confirms a direct PASS or clean retest, all local gates and CodeQL are
+  green on the final documented commit, and the tag itself uses an authorized
+  fingerprint and passes its tag-triggered check.
 
 ## Verification
 

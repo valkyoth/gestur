@@ -13,7 +13,6 @@ from release_trust_policy import trust_policy_digest
 REVIEWER_KEY = "A" * 40
 BOUNDARY_REVIEWER_KEY = "B" * 40
 TAG_SIGNER_KEY = "C" * 40
-PENTESTER_KEY = "D" * 40
 SOURCE_DIGEST = "b" * 64
 BOUNDARY_DIGEST = "c" * 64
 
@@ -33,10 +32,6 @@ class GitFixture:
         self.write(
             "security/release-tag-signers.txt",
             f"{TAG_SIGNER_KEY} | Release Tag Signer\n",
-        )
-        self.write(
-            "security/external-pentesters.txt",
-            f"{PENTESTER_KEY} | Independent Pentester\n",
         )
         self.commit("root")
 
@@ -69,8 +64,6 @@ class GitFixture:
 def valid_signature(signature: Path, record: Path) -> str | None:
     if signature.read_text(encoding="utf-8") != "valid\n":
         return None
-    if "pentest" in record.parts:
-        return PENTESTER_KEY
     return BOUNDARY_REVIEWER_KEY if "feasibility" in record.parts else REVIEWER_KEY
 
 
@@ -83,37 +76,25 @@ def write_pentest_evidence(
     release: str,
     candidate: str,
     *,
-    tester: str = "Independent Pentester",
-    tester_key: str = PENTESTER_KEY,
-    reviewed: str | None = None,
+    tester: str = "Project Owner",
+    pentested: str | None = None,
+    release_candidate: str | None = None,
     status: str = "PASS",
-    report_path: str | None = None,
-    report_digest: str | None = None,
-    evidence_digest: str | None = None,
-    signature: str = "valid\n",
+    retest: str = "direct-pass",
+    post_changes: str = "none",
 ) -> None:
-    report_relative = report_path or f"security/pentest/reports/{release}/report.md"
-    report = "Independent penetration-test report\n"
-    fixture.write(report_relative, report)
-    support_relative = f"security/pentest/support/{release}/provider-evidence.txt"
-    support = "Provider scope and clean-retest evidence\n"
-    fixture.write(support_relative, support)
-    attestation_relative = f"security/pentest/{release}.md"
+    record_relative = f"security/pentest/{release}.md"
     fixture.write(
-        attestation_relative,
+        record_relative,
         f"Status: {status}\n"
         "Date: 2026-08-19\n"
-        f"Reviewed-Commit: {reviewed or candidate}\n"
+        f"Pentested-Commit: {pentested or candidate}\n"
+        f"Release-Candidate: {release_candidate or candidate}\n"
         "Scope: full release candidate\n"
         f"Tester: {tester}\n"
-        f"Tester-Key: {tester_key}\n"
-        f"Report: {report_relative}\n"
-        f"Report-Digest: {report_digest or hashlib.sha256(report.encode()).hexdigest()}\n"
-        f"Evidence: {support_relative}\n"
-        f"Evidence-Digest: {evidence_digest or hashlib.sha256(support.encode()).hexdigest()}\n"
-        f"Signature: {attestation_relative}.asc\n",
+        f"Retest: {retest}\n"
+        f"Post-Pentest-Changes: {post_changes}\n",
     )
-    fixture.write(f"{attestation_relative}.asc", signature)
 
 
 def write_source_evidence(

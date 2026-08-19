@@ -43,8 +43,8 @@ credential while still preserving emergency occupancy and controlled checkout.
   availability.
 - A dependency, toolchain, action, build environment, or release-channel
   supply-chain attacker.
-- A repository committer fabricating review/pentest fields, self-authorizing a
-  signer, or pushing a validly signed tag from an unapproved key or wrong commit.
+- A repository committer self-authorizing a review/tag signer, hiding code added
+  after a green pentest, or tagging an unapproved key or wrong commit.
 - Resource-exhaustion attempts through forms, workflows, files, searches,
   notifications, retries, plugin execution, or offline replay.
 
@@ -85,8 +85,8 @@ credential while still preserving emergency occupancy and controlled checkout.
 - Encrypted, bounded offline journals and explicit degraded-mode policy.
 - Exact tool/action pins, locked builds, source denial, SBOM, CI, CodeQL,
   independent pentest, and signed release evidence.
-- Role-separated externally pinned release identities, digest-bound provider
-  evidence, authorized tag fingerprints, and current-tag target validation.
+- Role-separated externally pinned signing identities, explicit pentest-versus-
+  CodeQL change history, authorized tag fingerprints, and target validation.
 
 ## Foundation Residual Risk
 
@@ -110,5 +110,5 @@ not prove correctness or security.
 - Prompt injection, data exfiltration, tool confusion, and AI-disabled parity.
 - Database/Valkey/object-store/WAN/printer/controller partial failures.
 - Upgrade, migration, backup, restore, and rollback under fault injection.
-- Registry self-authorization, role/key reuse, forged or mutated pentest
-  evidence, unauthorized valid tag keys, and tags targeting non-evidence commits.
+- Registry self-authorization, role/key reuse, unrecorded post-pentest changes,
+  unauthorized valid tag keys, and tags targeting non-evidence commits.

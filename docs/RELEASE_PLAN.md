@@ -39,8 +39,8 @@ No tag or workflow publishes a Cargo package.
   cryptographically valid annotated tag from an authorized release-tag signer
   in ancestor order before the candidate.
 - Candidate-controlled registry text is never a complete trust anchor. The
-  exact role-separated reviewer, external-pentester, and tag-signer registry
-  digest must match a protected value outside Git; key reuse across roles fails.
+  exact role-separated reviewer and tag-signer registry digest must match a
+  protected value outside Git; key reuse across roles fails.
 - Every v0 patch release states its compatibility impact explicitly. Gestur is
   in Semantic Versioning major-zero development; from v1.0.0 onward, fixes,
   compatible features, and breaking changes use patch, minor, and major
@@ -92,16 +92,17 @@ boundary implementation crate.
 
 Every release has one outcome, bounded deliverables, release-specific tests,
 updated security/privacy documentation, release notes, exact tool/dependency
-evidence, a clean implementation stop, an independent pentest of the exact
-commit, remediation and clean retest, green GitHub CI and CodeQL default setup,
-and an explicitly authorized signed tag.
+evidence, a clean implementation stop, an independent pentest of that HEAD,
+remediation and clean retest until the owner confirms green, a complete local
+rerun, green GitHub CI and CodeQL default setup, and an explicitly authorized
+signed tag on the final commit. A CodeQL fix after the pentest is documented in
+the pentest record and receives the full local and CodeQL gates again.
 
 The pentest obligation is also a capacity gate. Before scheduling a train,
-maintainers reserve its external provider, required specialist coverage,
-budget, lead time, clean-retest window, and contingency capacity. A scheduling
-or funding shortfall blocks the release; it never reduces pentest scope,
-frequency, independence, or exact-commit binding. `v0.10.4` establishes and
-tests this operating plan before later trains expand the external surface.
+maintainers reserve the owner's pentest/retest time, tooling, environment, scope,
+and contingency window. Missing capacity blocks the release; it never reduces
+pentest scope, frequency, or exact-commit binding. `v0.10.4` establishes and
+tests this operating plan before later trains expand the attack surface.
 
 A milestone is deployable or exercisable at its declared maturity. Early
 versions may expose only libraries, test harnesses, or a non-production binary;
@@ -138,8 +139,9 @@ release notes must state those limitations plainly.
 - Reject undeclared releases and require every lower declared version's signed
   annotated tag to be a distinct ancestor in numeric order and signed by an
   externally pinned authorized tag-role fingerprint.
-- Verify the independent pentest through an external-pentester signature over
-  the exact candidate and digests of both provider report and support artifact.
+- Verify the owner-confirmed pentest record names a real ancestor commit, PASS,
+  direct-pass or clean-retest outcome, and any later CodeQL remediation included
+  in the release candidate.
 - After tag creation, require protected tag-triggered CI to revalidate its
   signer, target evidence commit, full evidence set, and predecessor ancestry.
 
@@ -148,27 +150,24 @@ release notes must state those limitations plainly.
 For every version:
 
 1. Complete deliverables and local verification.
-2. Confirm the reserved independent provider, scope, specialist coverage,
-   budget, and clean-retest window are still available.
+2. Confirm the owner's pentest tooling, scope, environment, and clean-retest
+   window are available.
 3. Freeze the implementation candidate and stop with: vX.Y.Z implementation
    stop reached. Run pentest for this exact commit.
-4. Record temporary findings only in ignored root PENTEST.md. Fix every finding,
-   add regression tests, and repeat from a new candidate until clean.
-5. Confirm the candidate's three role registries match the protected external
-   trust-policy digest. Registry changes require two-person review and separate
-   protected-environment approval; candidate content cannot self-authorize.
-6. Review sources and applicable feasibility scopes against the final candidate;
-   produce attributable signed records and support digests.
-7. Obtain a signed external-pentester attestation binding the exact candidate,
-   scope, provider report digest, support digest, identity, and role key.
-8. Create one child evidence commit containing only the signed/digest-bound
-   pentest set and authorized source/feasibility records/support/signatures.
-9. Run the release gate against its parent candidate. It rejects any other
-   changed path, invalid review, undeclared version, or broken predecessor chain.
-10. Confirm GitHub CI and CodeQL default setup are green.
-11. Create and push a signed tag on the evidence commit only on explicit
-    maintainer instruction; protected tag-triggered CI must then validate the
-    current tag signer and target before the tag is treated as a release.
+4. The owner runs the pentest; record temporary findings only in ignored root
+   PENTEST.md.
+5. If it reports a finding, fix it, add regression tests, commit the new
+   HEAD, and request another pentest. Repeat until the owner reports green.
+6. Record PASS, direct-pass or clean-retest, tester, scope, and the actual green
+   `Pentested-Commit`; then rerun every applicable local repository gate.
+7. Confirm the candidate's reviewer/tag-signer registries match the protected
+   external trust-policy digest, and refresh signed source/feasibility evidence.
+8. Commit the pentest and review evidence, then wait for GitHub CI and CodeQL.
+9. If CodeQL reports an issue, fix it, add regression tests, rerun all local
+   gates, and update `Post-Pentest-Changes` with the CodeQL remediation. Commit
+   refreshed evidence and wait for CI/CodeQL again; repeat until green.
+10. Create and push a signed tag on that final green commit only on explicit
+    maintainer instruction; protected tag-triggered CI then validates the tag.
 
 The Exit criteria in every section below and every detailed patch stop include
 this complete rule. A pentest is not replaced by automated testing, fuzzing,
@@ -208,12 +207,12 @@ Their full deliverables and mandatory proof live in the detailed register.
 | Version | Added context |
 | --- | --- |
 | v0.10.2 | Record reviewed qualified/blocked feasibility outcomes for each production boundary. |
-| v0.10.4 | Reserve provider, specialist, budget, lead-time, retest, and contingency pentest capacity without waivers. |
+| v0.10.4 | Reserve owner pentest/retest time, tooling, environment, scope, and contingency capacity without waivers. |
 | v0.10.5 | Bind feasibility and source evidence to real commits, scope, digests, reviewer keys, and verified detached signatures. |
 | v0.10.6 | Reject undeclared releases and enforce distinct signed predecessor tags in strict ancestry order. |
 | v0.10.7 | Keep legal base instruments, applicable amendments, and consolidation state as one governed source set. |
-| v0.10.8 | Anchor role-separated release identities to a protected digest outside candidate-controlled Git. |
-| v0.10.9 | Require signed external pentest attestations over exact-candidate report and support digests. |
+| v0.10.8 | Anchor reviewer and tag-signer identities to a protected digest outside candidate-controlled Git. |
+| v0.10.9 | Enforce the owner-driven pentest/retest, full-test, CodeQL-fix, final-green loop. |
 | v0.10.10 | Authorize tag signer fingerprints and validate each newly created tag in protected CI. |
 | v0.99.1 | Establish one authoritative lifecycle for badge, Wallet, network, access, and parking projections. |
 | v0.100.1 | Qualify multi-printer routing and failover on two real supported devices. |

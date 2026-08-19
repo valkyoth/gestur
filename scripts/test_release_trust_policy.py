@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Adversarial tests for release trust anchors and pentest evidence."""
+"""Adversarial tests for release trust and the owner-driven pentest loop."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ REPOSITORY = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPOSITORY / "scripts"))
 
 from release_evidence_testkit import (  # noqa: E402
-    PENTESTER_KEY,
+    REVIEWER_KEY,
     TAG_SIGNER_KEY,
     GitFixture,
     validate,
@@ -31,7 +31,9 @@ class ReleaseTrustPolicyTests(unittest.TestCase):
             f"expected {fragment!r} in {errors!r}",
         )
 
-    def make_release(self, root: Path, **pentest: str) -> tuple[GitFixture, str]:
+    def make_release(
+        self, root: Path, **pentest: str
+    ) -> tuple[GitFixture, str]:
         fixture = GitFixture(root)
         candidate = fixture.commit("candidate")
         write_source_evidence(fixture, "v0.1.0", candidate)
@@ -77,17 +79,11 @@ class ReleaseTrustPolicyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             fixture = GitFixture(Path(directory))
             fixture.write(
-                "security/external-pentesters.txt",
-                f"{TAG_SIGNER_KEY} | Independent Pentester\n",
+                "security/release-tag-signers.txt",
+                f"{REVIEWER_KEY} | Release Tag Signer\n",
             )
             candidate = fixture.commit("candidate")
             write_source_evidence(fixture, "v0.1.0", candidate)
-            write_pentest_evidence(
-                fixture,
-                "v0.1.0",
-                candidate,
-                tester_key=TAG_SIGNER_KEY,
-            )
             fixture.commit("evidence")
             errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
         self.assert_error(errors, "crosses roles")
@@ -96,9 +92,9 @@ class ReleaseTrustPolicyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             fixture = GitFixture(Path(directory))
             fixture.write(
-                "security/external-pentesters.txt",
-                f"{PENTESTER_KEY} | Independent Pentester\n"
-                f"{'E' * 40} | Independent Pentester\n",
+                "security/release-tag-signers.txt",
+                f"{TAG_SIGNER_KEY} | Release Tag Signer\n"
+                f"{'E' * 40} | Release Tag Signer\n",
             )
             candidate = fixture.commit("candidate")
             write_source_evidence(fixture, "v0.1.0", candidate)
@@ -106,29 +102,19 @@ class ReleaseTrustPolicyTests(unittest.TestCase):
             errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
         self.assert_error(errors, "duplicate identity")
 
-    def test_unsigned_pentest_attestation_is_rejected(self) -> None:
+    def test_direct_green_pentest_passes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            fixture, candidate = self.make_release(
-                Path(directory), signature="forged\n"
-            )
+            fixture, candidate = self.make_release(Path(directory))
             errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
-        self.assert_error(errors, "detached signature is invalid")
+        self.assertEqual(errors, [])
 
-    def test_untrusted_pentester_is_rejected(self) -> None:
+    def test_clean_retest_passes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             fixture, candidate = self.make_release(
-                Path(directory), tester_key="E" * 40
+                Path(directory), retest="clean-retest"
             )
             errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
-        self.assert_error(errors, "tester key is not externally authorized")
-
-    def test_pentest_must_bind_exact_candidate(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            fixture, candidate = self.make_release(
-                Path(directory), reviewed="a" * 40
-            )
-            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
-        self.assert_error(errors, "reviewed commit is not the exact candidate")
+        self.assertEqual(errors, [])
 
     def test_non_pass_pentest_result_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -136,47 +122,80 @@ class ReleaseTrustPolicyTests(unittest.TestCase):
             errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
         self.assert_error(errors, "status is not PASS")
 
-    def test_cross_release_report_path_is_rejected(self) -> None:
+    def test_unknown_pentested_commit_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             fixture, candidate = self.make_release(
-                Path(directory),
-                report_path="security/pentest/reports/v0.0.1/report.md",
+                Path(directory), pentested="a" * 40
             )
             errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
-        self.assert_error(errors, "unsafe evidence path")
+        self.assert_error(errors, "pentested commit does not exist")
 
-    def test_pentest_report_mutation_is_rejected(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            fixture, candidate = self.make_release(
-                Path(directory), report_digest="0" * 64
-            )
-            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
-        self.assert_error(errors, "Report-Digest does not match")
-
-    def test_pentest_support_mutation_is_rejected(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            fixture, candidate = self.make_release(
-                Path(directory), evidence_digest="0" * 64
-            )
-            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
-        self.assert_error(errors, "Evidence-Digest does not match")
-
-    def test_cryptographically_valid_but_untrusted_predecessor_fails(self) -> None:
+    def test_nonancestor_pentested_commit_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             fixture = GitFixture(Path(directory))
-            fixture.commit("v0.1.0")
-            fixture.tag("v0.1.0")
+            main = fixture.run("branch", "--show-current")
+            fixture.run("switch", "-q", "-c", "pentest-side")
+            pentested = fixture.commit("unrelated pentest target")
+            fixture.run("switch", "-q", main)
             candidate = fixture.commit("candidate")
-            write_source_evidence(fixture, "v0.1.1", candidate)
-            fixture.commit("evidence")
-            errors = validate(
+            write_source_evidence(fixture, "v0.1.0", candidate)
+            write_pentest_evidence(
                 fixture,
-                "v0.1.1",
+                "v0.1.0",
                 candidate,
-                {"v0.1.0", "v0.1.1"},
-                tag_verifier=lambda _root, _tag: "E" * 40,
+                pentested=pentested,
+                post_changes="CodeQL: unrelated branch must not pass",
             )
-        self.assert_error(errors, "predecessor tag v0.1.0 signer is not authorized")
+            fixture.commit("evidence")
+            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
+        self.assert_error(errors, "pentested commit is not a candidate ancestor")
+
+    def test_report_must_name_evidence_parent_candidate(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            fixture, candidate = self.make_release(
+                Path(directory), release_candidate="a" * 40
+            )
+            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
+        self.assert_error(errors, "release candidate is not the evidence parent")
+
+    def test_retest_outcome_is_bounded(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            fixture, candidate = self.make_release(Path(directory), retest="maybe")
+            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
+        self.assert_error(errors, "Retest must be direct-pass or clean-retest")
+
+    def test_codeql_fix_after_green_pentest_is_recorded(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = GitFixture(Path(directory))
+            pentested = fixture.commit("pentested implementation")
+            candidate = fixture.commit("CodeQL remediation")
+            write_source_evidence(fixture, "v0.1.0", candidate)
+            write_pentest_evidence(
+                fixture,
+                "v0.1.0",
+                candidate,
+                pentested=pentested,
+                post_changes="CodeQL: corrected the reported issue and reran all gates",
+            )
+            fixture.commit("updated release evidence")
+            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
+        self.assertEqual(errors, [])
+
+    def test_unrecorded_change_after_green_pentest_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = GitFixture(Path(directory))
+            pentested = fixture.commit("pentested implementation")
+            candidate = fixture.commit("later code change")
+            write_source_evidence(fixture, "v0.1.0", candidate)
+            write_pentest_evidence(
+                fixture,
+                "v0.1.0",
+                candidate,
+                pentested=pentested,
+            )
+            fixture.commit("evidence")
+            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
+        self.assert_error(errors, "later candidate changes require a CodeQL summary")
 
     def test_current_tag_must_target_approved_evidence_commit(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

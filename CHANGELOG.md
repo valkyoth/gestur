@@ -4,9 +4,9 @@ All notable Gestur changes are documented here.
 
 ## Unreleased
 
-- Added externally pinned, role-separated release trust policy; signed and
-  digest-bound pentest evidence; authorized tag fingerprints; and protected
-  current-tag CI validation with adversarial real-Git/GPG tests.
+- Added externally pinned reviewer/tag-signer trust, an owner-driven
+  pentest/retest and CodeQL-remediation record, authorized tag fingerprints, and
+  protected current-tag validation with adversarial real-Git/GPG tests.
 - Bound release review evidence to real Git ancestry, reviewed scopes, support
   digests, attributable detached signatures, an evidence-only commit, and the
   complete declared signed predecessor-tag chain; added real-Git mutation tests.
