@@ -17,6 +17,7 @@ from release_evidence_testkit import (  # noqa: E402
     REVIEWER_KEY,
     TAG_SIGNER_KEY,
     GitFixture,
+    codeql_delta_fields,
     validate,
     write_pentest_evidence,
     write_source_evidence,
@@ -40,6 +41,39 @@ class ReleaseTrustPolicyTests(unittest.TestCase):
         if pentest:
             write_pentest_evidence(fixture, "v0.1.0", candidate, **pentest)
         fixture.commit("evidence")
+        return fixture, candidate
+
+    def make_codeql_release(
+        self, root: Path, **overrides: str
+    ) -> tuple[GitFixture, str]:
+        fixture = GitFixture(root)
+        pentested = fixture.commit("pentested implementation")
+        write_source_evidence(fixture, "v0.1.0", pentested)
+        base = fixture.commit("initial green pentest evidence")
+        fixture.write("docs/scope.md", "CodeQL remediation\n")
+        fixture.write("tests/codeql_regression.txt", "regression coverage\n")
+        candidate = fixture.commit("CodeQL remediation")
+        write_source_evidence(
+            fixture,
+            "v0.1.0",
+            candidate,
+            signature="valid-codeql\n",
+            support="Primary-source review after CodeQL remediation\n",
+        )
+        fields = codeql_delta_fields(
+            fixture, base, candidate, "tests/codeql_regression.txt"
+        )
+        if overrides.get("codeql_delta_base") == "pentested":
+            overrides["codeql_delta_base"] = pentested
+        fields.update(overrides)
+        write_pentest_evidence(
+            fixture,
+            "v0.1.0",
+            candidate,
+            pentested=pentested,
+            **fields,
+        )
+        fixture.commit("updated release evidence")
         return fixture, candidate
 
     def test_external_policy_pin_matches_candidate(self) -> None:
@@ -116,6 +150,36 @@ class ReleaseTrustPolicyTests(unittest.TestCase):
             errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
         self.assertEqual(errors, [])
 
+    def test_pentest_tool_without_version_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            fixture, candidate = self.make_release(
+                Path(directory), tools="unversioned-scanner"
+            )
+            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
+        self.assert_error(errors, "Tools must name each third-party tool and version")
+
+    def test_duplicate_pentest_tool_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            fixture, candidate = self.make_release(
+                Path(directory), tools="scanner@1.0,scanner@1.0"
+            )
+            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
+        self.assert_error(errors, "duplicate pentest tool")
+
+    def test_missing_pentest_configuration_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            fixture, candidate = self.make_release(Path(directory), configuration="")
+            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
+        self.assert_error(errors, "expected exactly one Configuration field")
+
+    def test_future_pentest_date_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            fixture, candidate = self.make_release(
+                Path(directory), checked="2026-08-20"
+            )
+            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
+        self.assert_error(errors, "date is in the future")
+
     def test_non_pass_pentest_result_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             fixture, candidate = self.make_release(Path(directory), status="FAIL")
@@ -166,36 +230,58 @@ class ReleaseTrustPolicyTests(unittest.TestCase):
 
     def test_codeql_fix_after_green_pentest_is_recorded(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            fixture = GitFixture(Path(directory))
-            pentested = fixture.commit("pentested implementation")
-            candidate = fixture.commit("CodeQL remediation")
-            write_source_evidence(fixture, "v0.1.0", candidate)
-            write_pentest_evidence(
-                fixture,
-                "v0.1.0",
-                candidate,
-                pentested=pentested,
-                post_changes="CodeQL: corrected the reported issue and reran all gates",
-            )
-            fixture.commit("updated release evidence")
+            fixture, candidate = self.make_codeql_release(Path(directory))
             errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
         self.assertEqual(errors, [])
 
-    def test_unrecorded_change_after_green_pentest_is_rejected(self) -> None:
+    def test_free_text_codeql_delta_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            fixture = GitFixture(Path(directory))
-            pentested = fixture.commit("pentested implementation")
-            candidate = fixture.commit("later code change")
-            write_source_evidence(fixture, "v0.1.0", candidate)
-            write_pentest_evidence(
-                fixture,
-                "v0.1.0",
-                candidate,
-                pentested=pentested,
+            fixture, candidate = self.make_codeql_release(
+                Path(directory),
+                post_changes="CodeQL: free text is not structured evidence",
             )
-            fixture.commit("evidence")
             errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
-        self.assert_error(errors, "later candidate changes require a CodeQL summary")
+        self.assert_error(errors, "later candidate changes must be a CodeQL delta")
+
+    def test_codeql_changed_paths_are_exact(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            fixture, candidate = self.make_codeql_release(
+                Path(directory), changed_paths="tests/codeql_regression.txt"
+            )
+            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
+        self.assert_error(errors, "Changed-Paths does not match")
+
+    def test_codeql_delta_base_must_be_candidate_parent(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            fixture, candidate = self.make_codeql_release(
+                Path(directory), codeql_delta_base="pentested"
+            )
+            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
+        self.assert_error(errors, "CodeQL delta base is not the candidate parent")
+
+    def test_codeql_diff_digest_mutation_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            fixture, candidate = self.make_codeql_release(
+                Path(directory), diff_digest="0" * 64
+            )
+            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
+        self.assert_error(errors, "Diff-Digest does not match")
+
+    def test_codeql_remediation_requires_regression_test(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            fixture, candidate = self.make_codeql_release(
+                Path(directory), regression_test="none"
+            )
+            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
+        self.assert_error(errors, "requires a regression test")
+
+    def test_codeql_full_gate_must_pass(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            fixture, candidate = self.make_codeql_release(
+                Path(directory), full_gate="FAIL"
+            )
+            errors = validate(fixture, "v0.1.0", candidate, {"v0.1.0"})
+        self.assert_error(errors, "Full-Gate is not PASS")
 
     def test_current_tag_must_target_approved_evidence_commit(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

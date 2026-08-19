@@ -82,8 +82,8 @@ Networked release freshness checks are separate:
 
     scripts/check_latest_tools.sh
 
-The release gate stops for an independent pentest. It never publishes a crate
-or creates a tag.
+The release gate stops for an owner-operated pentest with third-party security
+tools. It never publishes a crate or creates a tag.
 
 ## Non-Negotiable Direction
 

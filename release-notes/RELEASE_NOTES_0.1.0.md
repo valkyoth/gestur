@@ -1,6 +1,7 @@
 # Gestur 0.1.0 Release Notes
 
-Status: implementation complete; independent pentest required before tagging
+Status: implementation complete; owner-operated pentest with third-party
+security tools required before tagging
 
 ## Summary
 
@@ -33,7 +34,8 @@ no_std workspace foundation. It is not a usable visitor management release.
   outside Git, with candidate-only self-authorization and cross-role reuse
   rejected.
 - An owner-driven pentest/retest record that preserves the green pentested
-  commit, documents later CodeQL remediation, and precedes protected tag checks.
+  commit and its tool versions/configuration, and machine-verifies any later
+  CodeQL remediation before protected tag checks.
 - Linux, Windows, macOS, BSD, Android, and iOS verification posture.
 - A 500-line Rust source limit and no_std/unsafe/publishing/dependency gates.
 
@@ -44,10 +46,10 @@ no_std workspace foundation. It is not a usable visitor management release.
   connector, or deployment functionality exists yet.
 - Algorithm types are metadata only and must not be read as a cryptographic
   implementation claim.
-- A tag remains blocked until independent pentest findings are resolved and the
-  owner confirms a direct PASS or clean retest, all local gates and CodeQL are
-  green on the final documented commit, and the tag itself uses an authorized
-  fingerprint and passes its tag-triggered check.
+- A tag remains blocked until owner-operated pentest findings are resolved and
+  the owner confirms a direct PASS or clean retest, all local gates and CodeQL
+  are green on the final documented commit, and the tag itself uses an
+  authorized fingerprint and passes its tag-triggered check.
 
 ## Verification
 

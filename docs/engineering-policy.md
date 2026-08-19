@@ -18,7 +18,8 @@
 - Require unit/invariant and integration/boundary tests for every behavior.
   External implementation and platform claims additionally require real-system
   or acceptance evidence; mocks alone cannot close a milestone.
-- Stop every release for independent pentesting before tags.
+- Stop every release for owner-operated pentesting with third-party security
+  tools before tags.
 
 ## Testability
 

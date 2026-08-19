@@ -26,7 +26,6 @@ BOUNDARY_START = "<!-- boundary-feasibility:start -->"
 BOUNDARY_END = "<!-- boundary-feasibility:end -->"
 SOURCE_START = "<!-- source-locks:start -->"
 SOURCE_END = "<!-- source-locks:end -->"
-
 VERSION_RE = re.compile(r"^v0\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$|^v1\.0\.0$")
 BASE_RE = re.compile(r"^## (v0\.([1-9][0-9]*)\.0) — ", re.MULTILINE)
 DEPENDENCY_RE = re.compile(r"^- (v(?:0\.[0-9]+\.[0-9]+|1\.0\.0)) <- (.+)$")
@@ -46,6 +45,8 @@ REQUIRED_EDGES = {
     "v0.10.8": {"v0.10.5"},
     "v0.10.9": {"v0.10.4"},
     "v0.10.10": {"v0.10.6", "v0.10.8", "v0.10.9"},
+    "v0.10.11": {"v0.10.9"},
+    "v0.10.12": {"v0.10.11"},
     "v0.12.1": {"v0.10.2", "v0.11.1", "v0.11.3", "v0.11.5"},
     "v0.32.1": {"v0.3.6", "v0.3.7", "v0.11.5", "v0.30.1"},
     "v0.46.1": {"v0.45.6"},
@@ -74,7 +75,6 @@ REQUIRED_EDGES = {
     "v0.168.1": {"v0.58.2", "v0.140.1", "v0.166.1", "v0.167.1", "v0.167.2"},
     "v0.200.1": {"v0.199.1"},
 }
-
 REQUIRED_BOUNDARIES = {
     "sqlite": "v0.12.1",
     "postgresql": "v0.13.1",
@@ -117,7 +117,7 @@ REQUIRED_CONTRACT_TEXT = (
     "**Verification:**",
     "real implementation",
     "**Exit criteria:**",
-    "independent pentest",
+    "owner-operated pentest",
 )
 
 

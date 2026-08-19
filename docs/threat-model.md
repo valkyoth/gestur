@@ -84,7 +84,8 @@ credential while still preserving emergency occupancy and controlled checkout.
 - Tamper-evident audit roots replicated outside the mutable database.
 - Encrypted, bounded offline journals and explicit degraded-mode policy.
 - Exact tool/action pins, locked builds, source denial, SBOM, CI, CodeQL,
-  independent pentest, and signed release evidence.
+  owner-operated pentest with third-party security tools, and signed release
+  evidence.
 - Role-separated externally pinned signing identities, explicit pentest-versus-
   CodeQL change history, authorized tag fingerprints, and target validation.
 

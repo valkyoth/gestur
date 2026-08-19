@@ -9,6 +9,7 @@ from pathlib import Path
 
 import validate_release_evidence as release_validator
 from release_trust_policy import trust_policy_digest
+from validate_pentest_evidence import codeql_diff_digest
 
 REVIEWER_KEY = "A" * 40
 BOUNDARY_REVIEWER_KEY = "B" * 40
@@ -62,7 +63,7 @@ class GitFixture:
 
 
 def valid_signature(signature: Path, record: Path) -> str | None:
-    if signature.read_text(encoding="utf-8") != "valid\n":
+    if not signature.read_text(encoding="utf-8").startswith("valid"):
         return None
     return BOUNDARY_REVIEWER_KEY if "feasibility" in record.parts else REVIEWER_KEY
 
@@ -82,19 +83,59 @@ def write_pentest_evidence(
     status: str = "PASS",
     retest: str = "direct-pass",
     post_changes: str = "none",
+    tools: str = "cargo-audit@0.22.2,owner-security-suite@1.0.0",
+    configuration: str = "gestur-release-default",
+    codeql_rule: str = "none",
+    codeql_alert: str = "none",
+    codeql_delta_base: str = "none",
+    changed_paths: str = "none",
+    diff_digest: str = "none",
+    regression_test: str = "none",
+    full_gate: str = "PASS",
+    checked: str = "2026-08-19",
+    scope: str = "full release candidate",
 ) -> None:
     record_relative = f"security/pentest/{release}.md"
     fixture.write(
         record_relative,
         f"Status: {status}\n"
-        "Date: 2026-08-19\n"
+        f"Date: {checked}\n"
         f"Pentested-Commit: {pentested or candidate}\n"
         f"Release-Candidate: {release_candidate or candidate}\n"
-        "Scope: full release candidate\n"
+        f"Scope: {scope}\n"
         f"Tester: {tester}\n"
+        f"Tools: {tools}\n"
+        f"Configuration: {configuration}\n"
         f"Retest: {retest}\n"
-        f"Post-Pentest-Changes: {post_changes}\n",
+        f"Post-Pentest-Changes: {post_changes}\n"
+        f"CodeQL-Rule: {codeql_rule}\n"
+        f"CodeQL-Alert: {codeql_alert}\n"
+        f"CodeQL-Delta-Base: {codeql_delta_base}\n"
+        f"Changed-Paths: {changed_paths}\n"
+        f"Diff-Digest: {diff_digest}\n"
+        f"Regression-Test: {regression_test}\n"
+        f"Full-Gate: {full_gate}\n",
     )
+
+
+def codeql_delta_fields(
+    fixture: GitFixture, base: str, candidate: str, regression_test: str
+) -> dict[str, str]:
+    paths = fixture.run(
+        "diff", "--no-ext-diff", "--no-renames", "--name-only", base, candidate, "--"
+    ).splitlines()
+    digest = codeql_diff_digest(fixture.root, base, candidate)
+    if digest is None:
+        raise AssertionError("test fixture could not calculate CodeQL diff digest")
+    return {
+        "post_changes": "CodeQL",
+        "codeql_rule": "rust/example-rule",
+        "codeql_alert": "alert-123",
+        "codeql_delta_base": base,
+        "changed_paths": ",".join(sorted(paths)),
+        "diff_digest": digest,
+        "regression_test": regression_test,
+    }
 
 
 def write_source_evidence(
@@ -105,9 +146,9 @@ def write_source_evidence(
     reviewed: str | None = None,
     source_digest: str = SOURCE_DIGEST,
     signature: str = "valid\n",
+    support: str = "Primary-source review details\n",
 ) -> None:
     support_relative = f"evidence/source-freshness/reviews/{release}.md"
-    support = "Primary-source review details\n"
     fixture.write(support_relative, support)
     support_digest = hashlib.sha256(support.encode()).hexdigest()
     record_relative = f"evidence/source-freshness/{release}.md"

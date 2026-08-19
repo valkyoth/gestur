@@ -7,6 +7,10 @@ All notable Gestur changes are documented here.
 - Added externally pinned reviewer/tag-signer trust, an owner-driven
   pentest/retest and CodeQL-remediation record, authorized tag fingerprints, and
   protected current-tag validation with adversarial real-Git/GPG tests.
+- Made owner-operated pentest evidence reproducible through tool versions and
+  configuration metadata, and replaced free-text post-pentest CodeQL notes with
+  a machine-verified delta digest, paths, alert IDs, regression tests, and full
+  gate result.
 - Bound release review evidence to real Git ancestry, reviewed scopes, support
   digests, attributable detached signatures, an evidence-only commit, and the
   complete declared signed predecessor-tag chain; added real-Git mutation tests.

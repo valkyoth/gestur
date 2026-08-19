@@ -1,6 +1,7 @@
 # Gestur Release Plan To 1.0
 
-Status: planning document; v0.1.0 implementation complete and awaiting independent pentest
+Status: planning document; v0.1.0 implementation complete and awaiting an
+owner-operated pentest with third-party security tools
 
 This plan is intentionally granular. Every milestone must remain small enough to
 implement, review, test, document, pentest, and stop cleanly. Split a milestone
@@ -92,11 +93,14 @@ boundary implementation crate.
 
 Every release has one outcome, bounded deliverables, release-specific tests,
 updated security/privacy documentation, release notes, exact tool/dependency
-evidence, a clean implementation stop, an independent pentest of that HEAD,
+evidence, a clean implementation stop, an owner-operated pentest with
+third-party security tools against that HEAD,
 remediation and clean retest until the owner confirms green, a complete local
 rerun, green GitHub CI and CodeQL default setup, and an explicitly authorized
-signed tag on the final commit. A CodeQL fix after the pentest is documented in
-the pentest record and receives the full local and CodeQL gates again.
+signed tag on the final commit. The PASS record identifies each security tool
+and version, the applied configuration, tested commit, scope, date, result, and
+retest disposition. A CodeQL fix after the pentest is bounded by structured
+delta evidence and receives the full local and CodeQL gates again.
 
 The pentest obligation is also a capacity gate. Before scheduling a train,
 maintainers reserve the owner's pentest/retest time, tooling, environment, scope,
@@ -140,8 +144,13 @@ release notes must state those limitations plainly.
   annotated tag to be a distinct ancestor in numeric order and signed by an
   externally pinned authorized tag-role fingerprint.
 - Verify the owner-confirmed pentest record names a real ancestor commit, PASS,
-  direct-pass or clean-retest outcome, and any later CodeQL remediation included
-  in the release candidate.
+  direct-pass or clean-retest outcome, every security tool and version, applied
+  configuration, scope, and any later CodeQL remediation included in the
+  release candidate.
+- For a later CodeQL remediation, recompute the recorded rule/alert-bound delta
+  direct-parent base, exact changed paths, canonical binary-diff SHA-256,
+  changed regression tests, and full-gate PASS; reject free-text or unrecorded
+  later code.
 - After tag creation, require protected tag-triggered CI to revalidate its
   signer, target evidence commit, full evidence set, and predecessor ancestry.
 
@@ -150,22 +159,25 @@ release notes must state those limitations plainly.
 For every version:
 
 1. Complete deliverables and local verification.
-2. Confirm the owner's pentest tooling, scope, environment, and clean-retest
-   window are available.
+2. Confirm the owner's third-party pentest tools and exact versions,
+   configuration, scope, environment, and clean-retest window are available.
 3. Freeze the implementation candidate and stop with: vX.Y.Z implementation
    stop reached. Run pentest for this exact commit.
 4. The owner runs the pentest; record temporary findings only in ignored root
    PENTEST.md.
 5. If it reports a finding, fix it, add regression tests, commit the new
    HEAD, and request another pentest. Repeat until the owner reports green.
-6. Record PASS, direct-pass or clean-retest, tester, scope, and the actual green
-   `Pentested-Commit`; then rerun every applicable local repository gate.
+6. Record PASS, date, direct-pass or clean-retest, tester, scope, every tool and
+   version, applied configuration, and the actual green `Pentested-Commit`;
+   then rerun every applicable local repository gate.
 7. Confirm the candidate's reviewer/tag-signer registries match the protected
    external trust-policy digest, and refresh signed source/feasibility evidence.
 8. Commit the pentest and review evidence, then wait for GitHub CI and CodeQL.
-9. If CodeQL reports an issue, fix it, add regression tests, rerun all local
-   gates, and update `Post-Pentest-Changes` with the CodeQL remediation. Commit
-   refreshed evidence and wait for CI/CodeQL again; repeat until green.
+9. If CodeQL reports an issue, fix it, add regression tests, and rerun all local
+   gates. Record `Post-Pentest-Changes: CodeQL`, rule and alert IDs, the delta
+   base, exact changed paths, canonical diff digest, changed regression-test
+   paths, and full-gate PASS. Commit refreshed evidence and wait for CI/CodeQL
+   again; repeat until green.
 10. Create and push a signed tag on that final green commit only on explicit
     maintainer instruction; protected tag-triggered CI then validates the tag.
 
@@ -214,6 +226,8 @@ Their full deliverables and mandatory proof live in the detailed register.
 | v0.10.8 | Anchor reviewer and tag-signer identities to a protected digest outside candidate-controlled Git. |
 | v0.10.9 | Enforce the owner-driven pentest/retest, full-test, CodeQL-fix, final-green loop. |
 | v0.10.10 | Authorize tag signer fingerprints and validate each newly created tag in protected CI. |
+| v0.10.11 | Bind owner-operated pentest PASS to tool versions, configuration, exact commit, scope, date, and retest outcome. |
+| v0.10.12 | Machine-verify the direct-parent CodeQL-only delta, regression test, and full-gate evidence after pentest. |
 | v0.99.1 | Establish one authoritative lifecycle for badge, Wallet, network, access, and parking projections. |
 | v0.100.1 | Qualify multi-printer routing and failover on two real supported devices. |
 | v0.101.1 | Bound guest Wi-Fi credentials and exclude router-administration authority. |
@@ -229,7 +243,8 @@ Their full deliverables and mandatory proof live in the detailed register.
 
 ## v0.1.0 — Workspace genesis
 
-Status: Implemented; independent pentest pending.
+Status: Implemented; owner-operated pentest with third-party security tools
+pending.
 
 Goal:
 
@@ -266,7 +281,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.1.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -309,7 +324,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.2.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -352,7 +367,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.3.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -395,7 +410,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.4.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -438,7 +453,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.5.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -481,7 +496,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.6.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -524,7 +539,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.7.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -567,7 +582,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.8.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -610,7 +625,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.9.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -653,7 +668,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.10.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -698,7 +713,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.11.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -741,7 +756,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.12.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -784,7 +799,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.13.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -827,7 +842,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.14.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -870,7 +885,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.15.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -913,7 +928,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.16.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -956,7 +971,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.17.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -999,7 +1014,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.18.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1042,7 +1057,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.19.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1085,7 +1100,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.20.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1130,7 +1145,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.21.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1173,7 +1188,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.22.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1216,7 +1231,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.23.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1259,7 +1274,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.24.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1302,7 +1317,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.25.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1345,7 +1360,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.26.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1388,7 +1403,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.27.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1431,7 +1446,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.28.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1474,7 +1489,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.29.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1517,7 +1532,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.30.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1562,7 +1577,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.31.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1605,7 +1620,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.32.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1648,7 +1663,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.33.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1691,7 +1706,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.34.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1734,7 +1749,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.35.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1777,7 +1792,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.36.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1820,7 +1835,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.37.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1863,7 +1878,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.38.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1906,7 +1921,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.39.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1949,7 +1964,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.40.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -1994,7 +2009,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.41.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2037,7 +2052,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.42.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2080,7 +2095,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.43.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2123,7 +2138,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.44.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2166,7 +2181,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.45.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2209,7 +2224,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.46.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2252,7 +2267,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.47.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2295,7 +2310,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.48.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2338,7 +2353,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.49.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2381,7 +2396,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.50.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2426,7 +2441,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.51.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2469,7 +2484,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.52.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2512,7 +2527,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.53.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2555,7 +2570,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.54.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2598,7 +2613,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.55.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2641,7 +2656,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.56.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2684,7 +2699,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.57.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2727,7 +2742,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.58.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2770,7 +2785,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.59.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2813,7 +2828,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.60.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2858,7 +2873,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.61.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2901,7 +2916,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.62.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2944,7 +2959,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.63.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -2987,7 +3002,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.64.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3030,7 +3045,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.65.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3073,7 +3088,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.66.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3116,7 +3131,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.67.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3159,7 +3174,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.68.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3202,7 +3217,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.69.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3245,7 +3260,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.70.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3290,7 +3305,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.71.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3333,7 +3348,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.72.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3376,7 +3391,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.73.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3419,7 +3434,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.74.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3462,7 +3477,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.75.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3505,7 +3520,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.76.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3548,7 +3563,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.77.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3591,7 +3606,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.78.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3634,7 +3649,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.79.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3677,7 +3692,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.80.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3722,7 +3737,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.81.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3765,7 +3780,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.82.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3808,7 +3823,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.83.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3851,7 +3866,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.84.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3894,7 +3909,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.85.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3937,7 +3952,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.86.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -3980,7 +3995,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.87.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4023,7 +4038,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.88.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4066,7 +4081,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.89.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4109,7 +4124,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.90.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4154,7 +4169,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.91.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4197,7 +4212,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.92.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4240,7 +4255,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.93.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4283,7 +4298,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.94.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4326,7 +4341,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.95.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4369,7 +4384,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.96.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4412,7 +4427,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.97.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4455,7 +4470,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.98.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4498,7 +4513,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.99.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4541,7 +4556,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.100.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4586,7 +4601,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.101.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4629,7 +4644,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.102.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4672,7 +4687,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.103.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4715,7 +4730,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.104.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4758,7 +4773,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.105.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4801,7 +4816,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.106.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4844,7 +4859,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.107.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4887,7 +4902,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.108.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4930,7 +4945,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.109.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -4973,7 +4988,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.110.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5018,7 +5033,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.111.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5061,7 +5076,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.112.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5104,7 +5119,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.113.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5147,7 +5162,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.114.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5190,7 +5205,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.115.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5233,7 +5248,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.116.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5276,7 +5291,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.117.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5319,7 +5334,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.118.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5362,7 +5377,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.119.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5405,7 +5420,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.120.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5450,7 +5465,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.121.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5493,7 +5508,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.122.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5536,7 +5551,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.123.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5579,7 +5594,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.124.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5622,7 +5637,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.125.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5665,7 +5680,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.126.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5708,7 +5723,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.127.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5751,7 +5766,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.128.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5794,7 +5809,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.129.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5837,7 +5852,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.130.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5882,7 +5897,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.131.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5925,7 +5940,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.132.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -5968,7 +5983,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.133.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6011,7 +6026,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.134.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6054,7 +6069,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.135.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6097,7 +6112,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.136.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6140,7 +6155,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.137.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6183,7 +6198,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.138.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6226,7 +6241,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.139.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6269,7 +6284,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.140.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6314,7 +6329,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.141.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6357,7 +6372,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.142.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6400,7 +6415,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.143.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6443,7 +6458,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.144.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6486,7 +6501,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.145.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6529,7 +6544,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.146.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6572,7 +6587,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.147.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6615,7 +6630,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.148.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6658,7 +6673,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.149.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6701,7 +6716,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.150.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6746,7 +6761,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.151.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6789,7 +6804,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.152.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6832,7 +6847,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.153.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6875,7 +6890,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.154.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6918,7 +6933,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.155.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -6961,7 +6976,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.156.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7004,7 +7019,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.157.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7047,7 +7062,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.158.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7090,7 +7105,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.159.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7133,7 +7148,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.160.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7178,7 +7193,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.161.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7221,7 +7236,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.162.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7264,7 +7279,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.163.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7307,7 +7322,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.164.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7350,7 +7365,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.165.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7393,7 +7408,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.166.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7436,7 +7451,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.167.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7479,7 +7494,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.168.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7522,7 +7537,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.169.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7565,7 +7580,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.170.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7610,7 +7625,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.171.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7653,7 +7668,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.172.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7696,7 +7711,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.173.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7739,7 +7754,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.174.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7782,7 +7797,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.175.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7825,7 +7840,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.176.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7868,7 +7883,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.177.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7911,7 +7926,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.178.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7954,7 +7969,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.179.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -7997,7 +8012,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.180.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8042,7 +8057,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.181.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8085,7 +8100,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.182.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8128,7 +8143,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.183.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8171,7 +8186,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.184.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8214,7 +8229,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.185.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8257,7 +8272,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.186.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8300,7 +8315,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.187.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8343,7 +8358,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.188.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8386,7 +8401,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.189.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8429,7 +8444,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.190.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8474,7 +8489,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.191.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8517,7 +8532,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.192.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8560,7 +8575,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.193.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8603,7 +8618,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.194.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8646,7 +8661,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.195.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8689,7 +8704,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.196.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8732,7 +8747,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.197.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8775,7 +8790,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.198.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8818,7 +8833,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.199.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8861,7 +8876,7 @@ Exit criteria:
 - The stated capability and adversarial tests pass, documentation matches
   behavior, no unresolved high-impact finding or hidden dependency remains,
   and the release can stop without unfinished migration or compatibility work.
-- Independent pentesting covers the exact implementation commit; every finding
+- Owner-operated pentesting with third-party security tools covers the exact implementation commit; every finding
   is fixed and cleanly retested before permanent PASS evidence or a tag.
 - v0.200.0 implementation stop reached. Run pentest for this exact commit.
 
@@ -8901,5 +8916,5 @@ Exit criteria:
 
 - All v1.0 claims have direct evidence, no release blocker or unresolved
   security finding remains, and the maintainer explicitly approves promotion.
-- Independent pentesting covers the exact production candidate.
+- Owner-operated pentesting with third-party security tools covers the exact production candidate.
 - v1.0.0 implementation stop reached. Run pentest for this exact commit.

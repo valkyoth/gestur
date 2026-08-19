@@ -1,7 +1,7 @@
 # Gestur Detailed Version Plan
 
-Status: planning document; v0.1.0 foundation implemented, independent pentest
-pending
+Status: planning document; v0.1.0 foundation implemented, owner-operated
+pentest with third-party security tools pending
 
 Production target: v1.0.0
 
@@ -73,7 +73,13 @@ Accepted corrections:
 - the pentest record distinguishes the commit actually tested from any later
   fully tested CodeQL remediation included in the release candidate;
 - predecessor and newly created tags must be signed by an authorized tag-role
-  fingerprint, and the new tag receives its own protected CI validation.
+  fingerprint, and the new tag receives its own protected CI validation;
+- owner-operated pentest evidence identifies every third-party security tool by
+  name and version, the applied configuration, exact tested commit, scope,
+  date, result, and direct-pass or clean-retest outcome;
+- a post-pentest CodeQL remediation uses structured rule/alert identifiers,
+  exact changed paths, a canonical diff digest, changed regression tests, and a
+  recorded full-gate PASS instead of an unauditable free-text note.
 
 Accepted with qualification:
 
@@ -95,8 +101,9 @@ Rejected or corrected:
   safe TLS, cryptography, OIDC, SQL, Unicode security, or Wasm execution
   impossible, the capability remains blocked rather than being hand-written or
   silently exempted.
-- Specialist cumulative reviews do not replace Gestur's independent
-  exact-commit pentest and clean-retest requirement at every version.
+- Specialist cumulative reviews do not replace Gestur's owner-operated
+  exact-commit pentest with third-party security tools and clean-retest
+  requirement at every version.
 - Per-version pentesting remains mandatory. Owner pentest/retest time, tooling,
   environment, scope, and contingency time must be reserved before work is
   scheduled; unavailable capacity blocks the train and never waives a test.
@@ -132,6 +139,13 @@ Rejected or corrected:
     remediation and receives the full local and CodeQL gates again.
 15. Both predecessor tags and the current tag require an authorized tag-signer
     fingerprint; the current tag must target the approved evidence-only commit.
+16. A green owner-operated pentest is reproducible evidence only when it names
+    each third-party tool and version plus the applied configuration, exact
+    tested commit, scope, date, result, and retest disposition.
+17. CodeQL-only changes after the green pentest are bounded by rule/alert IDs,
+    the remediation candidate's direct-parent base, exact changed paths,
+    canonical diff digest, changed regression tests, and a full-gate PASS before
+    CI/CodeQL reruns.
 
 ## Machine-Enforced Release Trust Root
 
@@ -146,6 +160,26 @@ self-review and administrator bypass are disabled. Until those external
 settings and at least one real identity per needed role exist, releases remain
 deliberately blocked. CODEOWNERS is routing evidence, not a substitute for this
 external enforcement.
+
+## Machine-Enforced Pentest And CodeQL Record
+
+The project owner operates the per-version pentest with third-party security
+tools; no external pentester identity, signature, or registry is implied. A
+PASS record names `Pentested-Commit` and `Release-Candidate` separately, and
+includes `Date`, `Scope`, `Tester`, comma-separated `Tools` entries in
+`name@version` form, `Configuration`, and `Retest` as `direct-pass` or
+`clean-retest`. A direct green result is valid when those fields bind the exact
+candidate and the structured CodeQL fields are `none` with `Full-Gate: PASS`.
+
+If CodeQL reports an issue after that pentest, the candidate may advance without
+silently expanding the pentest claim only for the recorded remediation. The
+record then requires `Post-Pentest-Changes: CodeQL`, `CodeQL-Rule`,
+`CodeQL-Alert`, the direct-parent `CodeQL-Delta-Base`, exact sorted
+`Changed-Paths`, the SHA-256 `Diff-Digest` of the canonical Git binary diff,
+one or more changed `Regression-Test` paths, and `Full-Gate: PASS`. The validator
+recomputes ancestry, paths, digest, and test presence. Any other later code,
+missing metadata, failed gate, or mismatch blocks the release; the owner may
+instead request a new pentest and reset the record to the new green commit.
 
 ## Machine-Enforced Boundary Feasibility Ledger
 
@@ -191,6 +225,8 @@ consumer.
 - v0.10.8 <- v0.10.5
 - v0.10.9 <- v0.10.4
 - v0.10.10 <- v0.10.6, v0.10.8, v0.10.9
+- v0.10.11 <- v0.10.9
+- v0.10.12 <- v0.10.11
 - v0.12.1 <- v0.10.2, v0.11.1, v0.11.3, v0.11.5
 - v0.32.1 <- v0.3.6, v0.3.7, v0.11.5, v0.30.1
 - v0.46.1 <- v0.45.6
@@ -236,7 +272,7 @@ adding, or moving a stop requires an explicit reviewable declaration change.
 - v0.7.0: v0.7.1
 - v0.8.0: v0.8.1
 - v0.9.0: v0.9.1
-- v0.10.0: v0.10.1, v0.10.2, v0.10.3, v0.10.4, v0.10.5, v0.10.6, v0.10.7, v0.10.8, v0.10.9, v0.10.10
+- v0.10.0: v0.10.1, v0.10.2, v0.10.3, v0.10.4, v0.10.5, v0.10.6, v0.10.7, v0.10.8, v0.10.9, v0.10.10, v0.10.11, v0.10.12
 - v0.11.0: v0.11.1, v0.11.2, v0.11.3, v0.11.4, v0.11.5
 - v0.12.0: v0.12.1
 - v0.13.0: v0.13.1
@@ -460,6 +496,8 @@ adding, or moving a stop requires an explicit reviewable declaration change.
 | v0.10.8 | Establish a role-separated reviewer/tag-signer trust policy anchored by a protected digest outside candidate-controlled Git history. | Real temporary Git history proves missing/malformed/mismatched pins, duplicate identities/fingerprints, cross-role key reuse, and candidate-only self-authorization fail; repository ruleset and `release-trust` environment evidence shows two distinct approvals, no self-review, and no administrator bypass. |
 | v0.10.9 | Make the owner-driven pentest, clean-retest, full-test, CodeQL-remediation, and final-green sequence explicit and machine-readable. | Real Git histories cover direct PASS, findings followed by clean retest, full-gate evidence, documented CodeQL-only follow-up changes, rejected unknown/non-ancestor pentest commits, rejected undocumented later code, and final CodeQL-green tag readiness. |
 | v0.10.10 | Authorize predecessor/current release tag fingerprints and validate every newly created tag against its approved evidence commit. | Real disposable OpenPGP keys and signed annotated tags; arbitrary valid key, missing/ambiguous authorization, wrong target, non-evidence target, altered evidence, lightweight/unsigned tag, and broken ancestry fail; protected tag-triggered CI passes the authorized complete chain. |
+| v0.10.11 | Make owner-operated pentest evidence reproducible without inventing an external pentester trust role. | Real Git histories prove direct-pass and clean-retest records bind PASS, date, exact tested commit, candidate, scope, tester, every third-party tool name/version, and applied configuration; missing, empty, duplicate, unversioned, future-dated, unknown, or non-ancestor data fails. |
+| v0.10.12 | Replace free-text post-pentest CodeQL notes with a bounded, machine-verified remediation envelope. | Real Git histories require the direct-parent delta base and recompute exact sorted paths, canonical binary-diff SHA-256, changed regression-test paths, and full-gate PASS; altered digest/path/test/base, unrecorded later code, or failed/missing gate fails, while direct green and valid CodeQL-only histories pass. |
 
 Phase exit: canonical envelopes and crypto-provider contracts are independently
 reviewed before storage/PII implementation; the foundation remains

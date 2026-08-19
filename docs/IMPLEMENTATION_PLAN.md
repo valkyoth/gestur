@@ -276,8 +276,8 @@ recovery, disaster runbooks, and automated restore proof.
 
 Stop feature work. Run complete database conformance, migration-from-every-
 supported-version, disaster restoration, chaos, load/soak, manual
-accessibility, privacy/compliance review, independent pentest, compatibility
-freeze, and an exact v1.0 release candidate.
+accessibility, privacy/compliance review, owner-operated pentest with third-party
+security tools, compatibility freeze, and an exact v1.0 release candidate.
 
 v1.0.0 adds no surprise functionality. It promotes only the qualified candidate
 after evidence, artifacts, checksums, provenance, documentation, CI, CodeQL,
@@ -301,9 +301,13 @@ and independent security results are complete.
 - Concurrency tests, deterministic fault injection, chaos, load, and soak.
 - Backup, PITR, restore, migration, upgrade, downgrade/rollback, and disaster
   rehearsals.
-- Independent pentest at every base or patch milestone stop, with specialist
-  cumulative campaigns at storage/privacy, edge/offline, plugin/egress,
-  cryptography/evidence, and release qualification boundaries.
+- Owner-operated pentest with third-party security tools at every base or patch
+  milestone stop, recording exact tool versions, configuration, commit, scope,
+  date, result, and retest outcome. Specialist cumulative campaigns remain at
+  storage/privacy, edge/offline, plugin/egress, cryptography/evidence, and
+  release qualification boundaries.
+- Any later CodeQL fix is restricted to a structured, digest-bound delta with
+  changed regression tests and a full-gate PASS before CI/CodeQL reruns.
 
 ## v1.0 Acceptance Scenario
 
@@ -317,4 +321,5 @@ plugin escape; and complete the flow with AI disabled.
 
 The detailed, evidence-addressable acceptance ledger is maintained in the
 [detailed version plan](DETAILED_VERSION_PLAN.md). The release must survive
-independent pentesting. Anything less remains pre-1.0.
+owner-operated pentesting with third-party security tools. Anything less
+remains pre-1.0.

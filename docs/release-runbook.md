@@ -13,8 +13,11 @@
      affected and full gates, commit a new HEAD, and request another pentest.
    - Repeat until the owner explicitly reports a direct PASS or clean retest.
 6. Write `security/pentest/vX.Y.Z.md` with PASS, date, actual green
-   `Pentested-Commit`, current `Release-Candidate`, scope, tester, `Retest` as
-   `direct-pass` or `clean-retest`, and `Post-Pentest-Changes: none`.
+   `Pentested-Commit`, current `Release-Candidate`, scope, tester, every
+   third-party security tool as `name@version`, the applied `Configuration`,
+   and `Retest` as `direct-pass` or `clean-retest`. For a direct green candidate,
+   set `Post-Pentest-Changes`, every CodeQL delta field, and regression tests to
+   `none`, with `Full-Gate: PASS`.
 7. Recheck every source lock and governed source set. Refresh signed source and
    applicable feasibility records against the release-candidate parent.
 8. Rerun `scripts/checks.sh`, cargo deny, cargo audit, SBOM verification,
@@ -25,10 +28,13 @@
 10. Wait for GitHub CI and CodeQL default setup on that commit:
     - If both are green, continue.
     - If CodeQL finds an issue, fix it, add a regression test, and rerun all
-      applicable local gates. Update the pentest record so `Pentested-Commit`
-      still names the last green pentest and `Post-Pentest-Changes` begins
-      `CodeQL: ` with the exact remediation. Refresh candidate-bound review
-      evidence, commit it, and wait for CI/CodeQL again. Repeat until green.
+      applicable local gates. Keep `Pentested-Commit` on the last green pentest
+      and record `Post-Pentest-Changes: CodeQL`, `CodeQL-Rule`, `CodeQL-Alert`,
+      direct-parent `CodeQL-Delta-Base`, exact sorted `Changed-Paths`, the
+      canonical Git binary-diff SHA-256 as `Diff-Digest`, changed
+      `Regression-Test` paths, and `Full-Gate: PASS`. Refresh candidate-bound
+      review evidence, commit it, and wait for CI/CodeQL again. Repeat until
+      green.
 11. Only after CI and CodeQL are green, create the authorized signed tag on the
     current commit. Push it only on explicit maintainer instruction, then require
     the `Signed Release Tag Check` to validate its signer, target, evidence, and

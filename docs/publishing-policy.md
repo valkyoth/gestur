@@ -18,7 +18,7 @@ requires a separate milestone with:
 - legal ownership and license review;
 - dependency and feature admission;
 - API and semver tests;
-- security review and independent pentest;
+- security review and owner-operated pentest with third-party security tools;
 - package-content and provenance checks;
 - an explicit list proving all internal crates remain private;
 - maintainer approval of credentials and a least-privilege publish workflow.
