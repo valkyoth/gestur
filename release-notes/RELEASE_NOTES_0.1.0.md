@@ -30,19 +30,15 @@ no_std workspace foundation. It is not a usable visitor management release.
   acceptance ledger.
 - Machine-enforced detailed stop ordering, ownership, dependency prerequisites,
   mandatory proof, source locks, and correct `v0.N.0` then `v0.N.P` chronology.
-- A fail-closed release-evidence gate that rejects undeclared versions, broken
-  signed predecessor-tag ancestry, self-asserted reviews, stale reviewed scopes,
-  invalid support digests/signatures, and non-evidence changes after candidate
-  freeze.
-- Role-separated reviewer and tag-signer registries bound to a protected digest
-  outside Git, with candidate-only self-authorization and cross-role reuse
-  rejected.
+- A fail-closed release gate that rejects undeclared versions, broken annotated
+  predecessor-tag ancestry, invalid pentest records, unrecorded post-pentest
+  code, and tags targeting the wrong commit.
 - An owner-driven pentest/retest record that preserves the green pentested
-  commit and its tool versions/configuration, and machine-verifies any later
-  CodeQL remediation before protected tag checks.
+  commit and machine-verifies the exact changed paths and regression tests for
+  any later CodeQL remediation.
 - Release-evidence validation that treats renames as deletion/addition pairs,
   preventing implementation removal from being disguised as an allowed
-  evidence-only change.
+  release-finalization change.
 - Linux, Windows, macOS, BSD, Android, and iOS verification posture.
 - A 500-line Rust source limit and no_std/unsafe/publishing/dependency gates.
 - Mutation tests proving crate-graph reversal, lost no_std posture, oversized
@@ -60,8 +56,8 @@ no_std workspace foundation. It is not a usable visitor management release.
   tenant isolation, authorization, persistence, or a usable Guest Journey.
 - A tag remains blocked until owner-operated pentest findings are resolved and
   the owner confirms a direct PASS or clean retest, all local gates and CodeQL
-  are green on the final documented commit, and the tag itself uses an
-  authorized fingerprint and passes its tag-triggered check.
+  are green on the final documented commit, and the tag targets that exact
+  commit and passes its tag-triggered check.
 
 ## Verification
 

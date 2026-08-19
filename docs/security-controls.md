@@ -19,21 +19,15 @@ Status: v0.1.0 foundation controls.
   evidence appropriate to every capability claim.
 - Read-only CI permissions and full-SHA GitHub Action pins.
 - cargo-deny, cargo-audit, SPDX SBOM, and CodeQL default setup policy.
-- Exact-commit owner-operated pentest with third-party security tools, recorded
-  tool versions, configuration, scope, date, and result before every tag.
-- Closed declared-release set; distinct signed predecessor tags must form a
-  strict ancestor chain, and only an evidence child commit may follow candidate
-  freeze.
-- Source and feasibility reviews bind real commits, scoped-change invalidation,
-  support digests, externally pinned reviewer key fingerprints, and verified
-  detached signatures.
-- Role-separated reviewer/tag-signer registries are bound to an external digest;
-  missing pins, ambiguous entries, and cross-role fingerprint reuse fail closed.
+- Exact-commit owner-operated pentest, recorded scope, date, result, resolved
+  findings, and direct-pass or clean-retest outcome before every tag.
+- Closed declared-release set; distinct annotated predecessor tags must form a
+  strict ancestor chain, and only release-status files may change before the
+  first post-pentest GitHub/CodeQL run.
 - Owner-operated pentest approval follows an owner-confirmed finding/retest
-  loop; the record preserves the green pentested commit and any later structured
-  CodeQL delta, exact paths/digest, changed regression test, and full-gate PASS.
-- Tag fingerprints require explicit authorization, and every newly pushed tag
-  receives a protected signer/target/evidence validation workflow.
+  loop; the record preserves the green pentested commit and any later CodeQL
+  finding, exact changed paths, changed regression tests, and full-gate PASS.
+- Every newly pushed tag receives a record/target/ancestry validation workflow.
 - EUPL-1.2 internal workspace with no registry publishing path.
 
 ## Designed Now, Implemented Later
@@ -51,5 +45,3 @@ Status: v0.1.0 foundation controls.
 
 Planned controls are not current product claims. Each becomes active only when
 its release deliverables, tests, documentation, and pentest evidence exist.
-No signing role is currently populated, so release gates intentionally remain
-blocked until the external two-person bootstrap is completed.

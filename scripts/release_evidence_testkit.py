@@ -1,21 +1,12 @@
-"""Shared real-Git fixtures for release-evidence tests."""
+"""Shared real-Git fixtures for Gestur release-flow tests."""
 
 from __future__ import annotations
 
-import hashlib
 import subprocess
 from datetime import date
 from pathlib import Path
 
 import validate_release_evidence as release_validator
-from release_trust_policy import trust_policy_digest
-from validate_pentest_evidence import codeql_diff_digest
-
-REVIEWER_KEY = "A" * 40
-BOUNDARY_REVIEWER_KEY = "B" * 40
-TAG_SIGNER_KEY = "C" * 40
-SOURCE_DIGEST = "b" * 64
-BOUNDARY_DIGEST = "c" * 64
 
 
 class GitFixture:
@@ -24,16 +15,7 @@ class GitFixture:
         self.run("init", "-q")
         self.run("config", "user.name", "Gestur Test")
         self.run("config", "user.email", "gestur-test@example.invalid")
-        self.write("docs/scope.md", "initial scope\n")
-        self.write(
-            "security/release-reviewers.txt",
-            f"{REVIEWER_KEY} | Release Reviewer\n"
-            f"{BOUNDARY_REVIEWER_KEY} | Boundary Reviewer\n",
-        )
-        self.write(
-            "security/release-tag-signers.txt",
-            f"{TAG_SIGNER_KEY} | Release Tag Signer\n",
-        )
+        self.write("README.md", "# fixture\n")
         self.commit("root")
 
     def run(self, *arguments: str) -> str:
@@ -62,148 +44,53 @@ class GitFixture:
             self.run("tag", tag, target)
 
 
-def valid_signature(signature: Path, record: Path) -> str | None:
-    if not signature.read_text(encoding="utf-8").startswith("valid"):
-        return None
-    return BOUNDARY_REVIEWER_KEY if "feasibility" in record.parts else REVIEWER_KEY
-
-
-def valid_tag(_repository: Path, _tag: str) -> str | None:
-    return TAG_SIGNER_KEY
-
-
-def write_pentest_evidence(
+def write_pentest_record(
     fixture: GitFixture,
     release: str,
-    candidate: str,
+    pentested: str,
     *,
-    tester: str = "Project Owner",
-    pentested: str | None = None,
-    release_candidate: str | None = None,
     status: str = "PASS",
-    retest: str = "direct-pass",
-    post_changes: str = "none",
-    tools: str = "cargo-audit@0.22.2,owner-security-suite@1.0.0",
-    configuration: str = "gestur-release-default",
-    codeql_rule: str = "none",
-    codeql_alert: str = "none",
-    codeql_delta_base: str = "none",
-    changed_paths: str = "none",
-    diff_digest: str = "none",
-    regression_test: str = "none",
-    full_gate: str = "PASS",
     checked: str = "2026-08-19",
-    scope: str = "full release candidate",
+    scope: str = "full repository",
+    retest: str = "clean-retest",
+    findings: str = "release validation bypass fixed",
+    codeql_finding: str = "none",
+    codeql_changed_paths: str = "none",
+    regression_tests: str = "none",
+    full_gate: str = "PASS",
 ) -> None:
-    record_relative = f"security/pentest/{release}.md"
     fixture.write(
-        record_relative,
+        f"security/pentest/{release}.md",
+        f"# {release} Pentest Record\n\n"
         f"Status: {status}\n"
         f"Date: {checked}\n"
-        f"Pentested-Commit: {pentested or candidate}\n"
-        f"Release-Candidate: {release_candidate or candidate}\n"
+        f"Pentested-Commit: {pentested}\n"
         f"Scope: {scope}\n"
-        f"Tester: {tester}\n"
-        f"Tools: {tools}\n"
-        f"Configuration: {configuration}\n"
         f"Retest: {retest}\n"
-        f"Post-Pentest-Changes: {post_changes}\n"
-        f"CodeQL-Rule: {codeql_rule}\n"
-        f"CodeQL-Alert: {codeql_alert}\n"
-        f"CodeQL-Delta-Base: {codeql_delta_base}\n"
-        f"Changed-Paths: {changed_paths}\n"
-        f"Diff-Digest: {diff_digest}\n"
-        f"Regression-Test: {regression_test}\n"
+        f"Findings-Resolved: {findings}\n"
+        f"CodeQL-Finding: {codeql_finding}\n"
+        f"CodeQL-Changed-Paths: {codeql_changed_paths}\n"
+        f"Regression-Tests: {regression_tests}\n"
         f"Full-Gate: {full_gate}\n",
     )
 
 
-def codeql_delta_fields(
-    fixture: GitFixture, base: str, candidate: str, regression_test: str
-) -> dict[str, str]:
-    paths = fixture.run(
-        "diff", "--no-ext-diff", "--no-renames", "--name-only", base, candidate, "--"
-    ).splitlines()
-    digest = codeql_diff_digest(fixture.root, base, candidate)
-    if digest is None:
-        raise AssertionError("test fixture could not calculate CodeQL diff digest")
-    return {
-        "post_changes": "CodeQL",
-        "codeql_rule": "rust/example-rule",
-        "codeql_alert": "alert-123",
-        "codeql_delta_base": base,
-        "changed_paths": ",".join(sorted(paths)),
-        "diff_digest": digest,
-        "regression_test": regression_test,
-    }
-
-
-def write_source_evidence(
-    fixture: GitFixture,
-    release: str,
-    candidate: str,
+def make_release(
+    root: Path,
+    release: str = "v0.1.0",
     *,
-    reviewed: str | None = None,
-    source_digest: str = SOURCE_DIGEST,
-    signature: str = "valid\n",
-    support: str = "Primary-source review details\n",
-) -> None:
-    support_relative = f"evidence/source-freshness/reviews/{release}.md"
-    fixture.write(support_relative, support)
-    support_digest = hashlib.sha256(support.encode()).hexdigest()
-    record_relative = f"evidence/source-freshness/{release}.md"
-    fixture.write(
-        record_relative,
-        "Status: PASS\n"
-        "Date: 2026-08-19\n"
-        f"Reviewed-Commit: {reviewed or candidate}\n"
-        f"Source-Lock-Digest: {source_digest}\n"
-        "Reviewer: Release Reviewer\n"
-        f"Reviewer-Key: {REVIEWER_KEY}\n"
-        f"Evidence: {support_relative}\n"
-        f"Evidence-Digest: {support_digest}\n"
-        f"Signature: {record_relative}.asc\n",
-    )
-    fixture.write(f"{record_relative}.asc", signature)
-    write_pentest_evidence(fixture, release, candidate)
-
-
-def write_boundary_evidence(
-    fixture: GitFixture,
-    candidate: str,
-    *,
-    reviewed: str | None = None,
-    scope: str = "docs/scope.md",
-    plan_digest: str = BOUNDARY_DIGEST,
-    support_digest: str | None = None,
-    signature: str = "valid\n",
-) -> dict[str, str]:
-    boundary = "sqlite"
-    support_relative = f"evidence/feasibility/support/{boundary}.md"
-    support = "SQLite boundary review details\n"
-    fixture.write(support_relative, support)
-    actual_support_digest = hashlib.sha256(support.encode()).hexdigest()
-    record_relative = f"evidence/feasibility/{boundary}.md"
-    fixture.write(
-        record_relative,
-        f"Boundary: {boundary}\n"
-        "Status: QUALIFIED\n"
-        f"Reviewed-Commit: {reviewed or candidate}\n"
-        f"Boundary-Plan-Digest: {plan_digest}\n"
-        f"Scope: {scope}\n"
-        "Reviewer: Boundary Reviewer\n"
-        f"Reviewer-Key: {BOUNDARY_REVIEWER_KEY}\n"
-        f"Evidence: {support_relative}\n"
-        f"Evidence-Digest: {support_digest or actual_support_digest}\n"
-        f"Signature: {record_relative}.asc\n",
-    )
-    fixture.write(f"{record_relative}.asc", signature)
-    return {
-        "decision_by": "v0.1.0",
-        "required_by": "v0.12.1",
-        "status": "qualified",
-        "evidence": record_relative,
-    }
+    predecessors: tuple[str, ...] = (),
+    **record: str,
+) -> tuple[GitFixture, str, str, set[str]]:
+    fixture = GitFixture(root)
+    declared = set(predecessors) | {release}
+    for predecessor in predecessors:
+        fixture.commit(predecessor)
+        fixture.tag(predecessor)
+    pentested = fixture.commit("implementation")
+    write_pentest_record(fixture, release, pentested, **record)
+    candidate = fixture.commit("release finalization")
+    return fixture, pentested, candidate, declared
 
 
 def validate(
@@ -212,28 +99,16 @@ def validate(
     candidate: str,
     declared: set[str],
     *,
-    boundaries: dict[str, dict[str, str]] | None = None,
-    boundary_digest: str = BOUNDARY_DIGEST,
-    signature_verifier=valid_signature,
-    tag_verifier=valid_tag,
-    expected_trust_policy_digest: str | None = None,
     tagged_release: bool = False,
 ) -> list[str]:
-    selected = boundaries or {}
     return release_validator.validate_release_evidence(
         release,
         fixture.root,
         candidate,
         declared,
-        selected,
-        {boundary: boundary_digest for boundary in selected},
-        SOURCE_DIGEST,
+        {},
+        {},
+        "unused",
         today=date(2026, 8, 19),
-        signature_verifier=signature_verifier,
-        tag_verifier=tag_verifier,
-        expected_trust_policy_digest=(
-            expected_trust_policy_digest
-            or trust_policy_digest(fixture.root, candidate)
-        ),
         tagged_release=tagged_release,
     )

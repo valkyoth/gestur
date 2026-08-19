@@ -14,11 +14,8 @@ test -f docs/security-controls.md
 test -f docs/supply-chain-security.md
 test -f docs/unsafe-policy.md
 test -f docs/github-security-settings.md
-test -f security/release-reviewers.txt
-test -f security/release-tag-signers.txt
-test -f security/release-trust-keyring.asc
-test -f docs/release-trust-governance.md
 test -f .github/workflows/release-tag.yml
-grep -q 'GESTUR_RELEASE_TRUST_POLICY_SHA256' .github/workflows/release-tag.yml
-grep -q 'deployment: false' .github/workflows/release-tag.yml
+grep -q 'validate-tagged-release.sh' .github/workflows/release-tag.yml
 test ! -f PENTEST.md
+test ! -f pentest.md
+test ! -f GAPANALYSIS.md

@@ -14,18 +14,16 @@ source policy, tool pins, action SHA pins, and SBOM still form release evidence.
 - Use GitHub CodeQL default setup.
 - Keep CI permissions read-only unless a reviewed job needs more.
 - Never store a crates.io credential while all packages are private.
-- Sign release tags and publish checksums/provenance only after the pentest stop.
+- Create annotated release tags and publish checksums/provenance only after the
+  pentest, full local gate, and green GitHub CI/CodeQL stops.
 - Accept only roadmap-declared releases. Verify every predecessor as a distinct
-  signed annotated tag from an externally pinned authorized fingerprint in
-  strict Git ancestry order.
-- Freeze the candidate, then permit one evidence-only child commit whose signed
-  source/feasibility reviews and owner-confirmed pentest record bind that
-  candidate and identify the commit actually pentested.
-- Keep reviewer and tag-signer roles separate; bind their candidate registries
-  to a protected digest outside Git.
+  annotated tag in strict Git ancestry order.
+- After the owner confirms the exact implementation commit green, permit only
+  the pentest record and release-status documentation before the first
+  GitHub/CodeQL run.
 - Record later CodeQL remediation without rewriting which commit received the
   green pentest; rerun all local gates and CodeQL before tagging.
-- Validate the newly pushed tag's signer and exact evidence target in protected
+- Validate the newly pushed tag's exact release target and ancestry in
   tag-triggered CI before treating it as a release.
 
 ## Dependency Admission

@@ -12,9 +12,11 @@ esac
 
 version="${tag#v}"
 notes="release-notes/RELEASE_NOTES_${version}.md"
-candidate="$(git rev-parse HEAD^)"
+candidate="$(git rev-parse HEAD)"
 
 test ! -f PENTEST.md
+test ! -f pentest.md
+test ! -f GAPANALYSIS.md
 test -f "$notes"
 test -s sbom/gestur.spdx.json
 scripts/generate-sbom.sh --check

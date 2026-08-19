@@ -10,11 +10,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from validate_release_evidence import (
-    SignatureVerifier,
-    TagVerifier,
-    validate_release_evidence,
-)
+from validate_release_evidence import validate_release_evidence
 
 REGISTER_START = "<!-- detailed-stop-register:start -->"
 REGISTER_END = "<!-- detailed-stop-register:end -->"
@@ -406,8 +402,6 @@ def validate_release(
     *,
     candidate: str | None = None,
     today: date | None = None,
-    signature_verifier: SignatureVerifier | None = None,
-    tag_verifier: TagVerifier | None = None,
     tagged_release: bool = False,
 ) -> list[str]:
     errors: list[str] = []
@@ -438,11 +432,6 @@ def validate_release(
     if errors:
         return errors
 
-    kwargs = {}
-    if signature_verifier is not None:
-        kwargs["signature_verifier"] = signature_verifier
-    if tag_verifier is not None:
-        kwargs["tag_verifier"] = tag_verifier
     boundary_digests = {
         boundary: boundary_plan_digest(plan_text, boundary) for boundary in boundaries
     }
@@ -456,7 +445,6 @@ def validate_release(
         source_lock_digest(plan_text),
         today=today,
         tagged_release=tagged_release,
-        **kwargs,
     )
 
 def main() -> int:

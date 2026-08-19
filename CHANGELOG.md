@@ -10,16 +10,14 @@ All notable Gestur changes are documented here.
 - Added mutation-tested enforcement for the exact crate dependency graph,
   no_std/unsafe/source-size posture, package publication denial, and registry,
   Git, build, and target-specific dependency escapes.
-- Added externally pinned reviewer/tag-signer trust, an owner-driven
-  pentest/retest and CodeQL-remediation record, authorized tag fingerprints, and
-  protected current-tag validation with adversarial real-Git/GPG tests.
-- Made owner-operated pentest evidence reproducible through tool versions and
-  configuration metadata, and replaced free-text post-pentest CodeQL notes with
-  a machine-verified delta digest, paths, alert IDs, regression tests, and full
-  gate result.
-- Bound release review evidence to real Git ancestry, reviewed scopes, support
-  digests, attributable detached signatures, an evidence-only commit, and the
-  complete declared signed predecessor-tag chain; added real-Git mutation tests.
+- Added an owner-driven pentest/retest and CodeQL-remediation record, exact tag
+  target validation, and adversarial real-Git release-flow tests.
+- Made owner-operated pentest evidence bind the exact tested commit, scope,
+  resolved findings, and full-gate result. Later CodeQL changes must record the
+  finding, exact paths, and changed regression tests before another CodeQL run.
+- Enforced declared annotated predecessor-tag ancestry without adding reviewer
+  registries, external trust digests, detached evidence signatures, or a second
+  approval ceremony to the owner's release process.
 - Locked the EU AI Act base regulation and its 2026 amending regulation as one
   governed source set rather than treating the amendment as the complete act.
 - Corrected major-zero release-train chronology, expanded every grouped roadmap

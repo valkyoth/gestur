@@ -1,10 +1,8 @@
 * @eldryoth
 
-# Sensitive release trust paths. A second distinct security owner and the
-# external two-person controls in docs/release-trust-governance.md are required
-# before production; this routing entry cannot authorize a release by itself.
-/security/release-reviewers.txt @eldryoth
-/security/release-tag-signers.txt @eldryoth
-/security/release-trust-keyring.asc @eldryoth
+# Release validation changes remain explicitly routed to the project owner.
 /.github/workflows/release-tag.yml @eldryoth
-/docs/release-trust-governance.md @eldryoth
+/scripts/validate-release-readiness.sh @eldryoth
+/scripts/validate-tagged-release.sh @eldryoth
+/scripts/validate_pentest_evidence.py @eldryoth
+/scripts/validate_release_evidence.py @eldryoth

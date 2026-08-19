@@ -33,7 +33,9 @@ __pycache__/
 *.der
 
 # Local release/security scratch
-PENTEST.md
+/PENTEST.md
+/pentest.md
+/GAPANALYSIS.md
 
 # Generated archives and temporary data
 /dist/

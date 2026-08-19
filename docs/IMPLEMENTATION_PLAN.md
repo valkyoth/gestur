@@ -43,12 +43,12 @@ site edge and isolated native vendor agent.
   of the implementation.
 - No release tag before an owner-operated exact-commit pentest with third-party
   security tools and a direct PASS or clean retest.
-- Release reviewer and tag-signer keys are separate roles; candidate registry
-  changes cannot take effect without an externally protected digest update and
-  two-person governance.
-- Pentest results follow the owner-confirmed finding/retest loop with exact tool
-  versions and configuration. Later CodeQL fixes use the structured delta
-  record, are fully retested, and are rechecked by CodeQL before tagging.
+- Pentest results follow the owner-confirmed finding/retest loop. Once green,
+  all local gates rerun and the finalization commit waits for GitHub CI and
+  CodeQL before tagging.
+- Later CodeQL fixes name the finding, exact changed paths, and changed
+  regression tests in the pentest record, rerun all local gates, and wait for
+  CodeQL again without adding a second approval or pentest ceremony.
 
 ## Architectural Decisions To Freeze
 
@@ -303,13 +303,13 @@ and independent security results are complete.
 - Concurrency tests, deterministic fault injection, chaos, load, and soak.
 - Backup, PITR, restore, migration, upgrade, downgrade/rollback, and disaster
   rehearsals.
-- Owner-operated pentest with third-party security tools at every base or patch
-  milestone stop, recording exact tool versions, configuration, commit, scope,
-  date, result, and retest outcome. Specialist cumulative campaigns remain at
+- Owner-operated pentest at every base or patch milestone stop, recording the
+  exact commit, scope, date, resolved findings, and direct-pass or clean-retest
+  outcome. Specialist cumulative campaigns remain at
   storage/privacy, edge/offline, plugin/egress, cryptography/evidence, and
   release qualification boundaries.
-- Any later CodeQL fix is restricted to a structured, digest-bound delta with
-  changed regression tests and a full-gate PASS before CI/CodeQL reruns.
+- Any later CodeQL fix records its exact changed paths and changed regression
+  tests with a full-gate PASS before CI/CodeQL reruns.
 
 ## v1.0 Acceptance Scenario
 

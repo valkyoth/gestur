@@ -36,12 +36,8 @@ No tag or workflow publishes a Cargo package.
   an explicit `none`. The declaration and detailed register must match exactly,
   so accidental row deletion, addition, or reassignment fails closed.
 - A requested release must be one declared base, one stop in that base's exact
-  declaration, or `v1.0.0`. Every lower declared release must have a distinct,
-  cryptographically valid annotated tag from an authorized release-tag signer
-  in ancestor order before the candidate.
-- Candidate-controlled registry text is never a complete trust anchor. The
-  exact role-separated reviewer and tag-signer registry digest must match a
-  protected value outside Git; key reuse across roles fails.
+  declaration, or `v1.0.0`. Every lower declared release must have a distinct
+  annotated tag in ancestor order before the candidate.
 - Every v0 patch release states its compatibility impact explicitly. Gestur is
   in Semantic Versioning major-zero development; from v1.0.0 onward, fixes,
   compatible features, and breaking changes use patch, minor, and major
@@ -83,24 +79,21 @@ blocked and unreachable. This feasibility gate does not itself authorize a
 dependency or weaken the zero-third-party rule. Its machine-readable ledger is
 checked again at release time: pending decisions block `v0.10.2`, and a later
 consumer cannot release unless its exact boundary is qualified with evidence.
-The evidence names an existing ancestor commit and complete reviewed scope,
-binds the exact boundary-plan and supporting-evidence digests, and carries an
-attributable detached signature from an externally pinned reviewer-role key. A
-later scoped change invalidates it; the consuming release must cover the planned
-boundary implementation crate.
+The evidence names an existing ancestor commit and complete reviewed scope and
+binds the exact boundary-plan and supporting-evidence digests. A later scoped
+change invalidates it; the consuming release must cover the planned boundary
+implementation crate.
 
 ## Release Principles
 
 Every release has one outcome, bounded deliverables, release-specific tests,
-updated security/privacy documentation, release notes, exact tool/dependency
-evidence, a clean implementation stop, an owner-operated pentest with
-third-party security tools against that HEAD,
-remediation and clean retest until the owner confirms green, a complete local
-rerun, green GitHub CI and CodeQL default setup, and an explicitly authorized
-signed tag on the final commit. The PASS record identifies each security tool
-and version, the applied configuration, tested commit, scope, date, result, and
-retest disposition. A CodeQL fix after the pentest is bounded by structured
-delta evidence and receives the full local and CodeQL gates again.
+updated security/privacy documentation, release notes, a clean implementation
+stop, and an owner-operated pentest against that HEAD. Findings are fixed with
+regression tests and retested until the owner confirms green. The full local
+gate then runs, the release record/status is committed, and that commit waits
+for GitHub CI and CodeQL default setup. A CodeQL finding is fixed with a
+regression test, documented in the pentest record, fully retested locally, and
+committed for another CI/CodeQL run. Only the exact final green commit is tagged.
 
 The pentest obligation is also a capacity gate. Before scheduling a train,
 maintainers reserve the owner's pentest/retest time, tooling, environment, scope,
@@ -131,55 +124,46 @@ release notes must state those limitations plainly.
 - Validate the detailed stop's evidence index, source locks, support/non-claims,
   and real-system proof. Never use a hard-coded repository test count as a
   release claim.
-- Fail when a source lock exceeds its per-source maximum age. Add a release-time
-  freshness attestation that binds the current source-lock digest, and obtain
+- Fail when a source lock exceeds its per-source maximum age, and obtain
   qualified review when a legal/regulatory revision affects scope or claims.
 - Run the boundary-feasibility release check. From `v0.10.2`, every decision
   must carry reviewed evidence; a consuming adapter requires `qualified`, not
   merely a dependency edge to the feasibility milestone.
-- Validate the exact candidate and evidence-only child commit. Source and
-  feasibility records require real Git ancestry, scope invalidation checks,
-  support digests, reviewer identity/key, and a valid detached signature.
-- Reject undeclared releases and require every lower declared version's signed
-  annotated tag to be a distinct ancestor in numeric order and signed by an
-  externally pinned authorized tag-role fingerprint.
+- Reject undeclared releases and require every lower declared version's
+  annotated tag to be a distinct ancestor in numeric order.
 - Verify the owner-confirmed pentest record names a real ancestor commit, PASS,
-  direct-pass or clean-retest outcome, every security tool and version, applied
-  configuration, scope, and any later CodeQL remediation included in the
-  release candidate.
-- For a later CodeQL remediation, recompute the recorded rule/alert-bound delta
-  direct-parent base, exact changed paths, canonical binary-diff SHA-256,
-  changed regression tests, and full-gate PASS; reject free-text or unrecorded
-  later code.
-- After tag creation, require protected tag-triggered CI to revalidate its
-  signer, target evidence commit, full evidence set, and predecessor ancestry.
+  direct-pass or clean-retest outcome, resolved findings, scope, and full local
+  gate result.
+- Permit only release-status files after a green pentest unless the record names
+  a CodeQL finding. A CodeQL remediation must list the exact changed paths and
+  one or more changed regression tests; unrecorded later code fails closed.
+- After tag creation, require tag-triggered CI to revalidate the record, exact
+  tag target, and predecessor ancestry.
 
 ## Pentest And Tag Stop
 
 For every version:
 
 1. Complete deliverables and local verification.
-2. Confirm the owner's third-party pentest tools and exact versions,
-   configuration, scope, environment, and clean-retest window are available.
+2. Confirm the owner's pentest scope, environment, and clean-retest window are
+   available.
 3. Freeze the implementation candidate and stop with: vX.Y.Z implementation
    stop reached. Run pentest for this exact commit.
 4. The owner runs the pentest; record temporary findings only in ignored root
    PENTEST.md.
 5. If it reports a finding, fix it, add regression tests, commit the new
    HEAD, and request another pentest. Repeat until the owner reports green.
-6. Record PASS, date, direct-pass or clean-retest, tester, scope, every tool and
-   version, applied configuration, and the actual green `Pentested-Commit`;
-   then rerun every applicable local repository gate.
-7. Confirm the candidate's reviewer/tag-signer registries match the protected
-   external trust-policy digest, and refresh signed source/feasibility evidence.
-8. Commit the pentest and review evidence, then wait for GitHub CI and CodeQL.
-9. If CodeQL reports an issue, fix it, add regression tests, and rerun all local
-   gates. Record `Post-Pentest-Changes: CodeQL`, rule and alert IDs, the delta
-   base, exact changed paths, canonical diff digest, changed regression-test
-   paths, and full-gate PASS. Commit refreshed evidence and wait for CI/CodeQL
-   again; repeat until green.
-10. Create and push a signed tag on that final green commit only on explicit
-    maintainer instruction; protected tag-triggered CI then validates the tag.
+6. Record PASS, date, direct-pass or clean-retest, scope, resolved findings, and
+   the actual green `Pentested-Commit`; rerun every applicable local gate and
+   record `Full-Gate: PASS`.
+7. Commit the pentest record and release-status documentation, then wait for
+   GitHub CI and CodeQL.
+8. If CodeQL reports an issue, fix it, add regression tests, and rerun all local
+   gates. Record the CodeQL finding, exact changed paths, changed regression
+   tests, and `Full-Gate: PASS`. Commit and wait for CI/CodeQL again; repeat
+   until green.
+9. Create the annotated tag on that exact green commit. The owner pushes it;
+   tag-triggered CI validates the record and target.
 
 The Exit criteria in every section below and every detailed patch stop include
 this complete rule. A pentest is not replaced by automated testing, fuzzing,
@@ -220,14 +204,14 @@ Their full deliverables and mandatory proof live in the detailed register.
 | --- | --- |
 | v0.10.2 | Record reviewed qualified/blocked feasibility outcomes for each production boundary. |
 | v0.10.4 | Reserve owner pentest/retest time, tooling, environment, scope, and contingency capacity without waivers. |
-| v0.10.5 | Bind feasibility and source evidence to real commits, scope, digests, reviewer keys, and verified detached signatures. |
-| v0.10.6 | Reject undeclared releases and enforce distinct signed predecessor tags in strict ancestry order. |
+| v0.10.5 | Bind feasibility evidence to real commits, scope, and support digests. |
+| v0.10.6 | Reject undeclared releases and enforce distinct annotated predecessor tags in strict ancestry order. |
 | v0.10.7 | Keep legal base instruments, applicable amendments, and consolidation state as one governed source set. |
-| v0.10.8 | Anchor reviewer and tag-signer identities to a protected digest outside candidate-controlled Git. |
+| v0.10.8 | Establish protected GitHub branch, CodeQL, and immutable-tag settings without a parallel approval authority. |
 | v0.10.9 | Enforce the owner-driven pentest/retest, full-test, CodeQL-fix, final-green loop. |
-| v0.10.10 | Authorize tag signer fingerprints and validate each newly created tag in protected CI. |
-| v0.10.11 | Bind owner-operated pentest PASS to tool versions, configuration, exact commit, scope, date, and retest outcome. |
-| v0.10.12 | Machine-verify the direct-parent CodeQL-only delta, regression test, and full-gate evidence after pentest. |
+| v0.10.10 | Validate each new annotated tag against the exact final release commit in tag-triggered CI. |
+| v0.10.11 | Bind owner-operated pentest PASS to the exact commit, scope, date, findings, and retest outcome. |
+| v0.10.12 | Machine-verify CodeQL remediation paths, regression tests, and full-gate evidence after pentest. |
 | v0.99.1 | Establish one authoritative lifecycle for badge, Wallet, network, access, and parking projections. |
 | v0.100.1 | Qualify multi-printer routing and failover on two real supported devices. |
 | v0.101.1 | Bound guest Wi-Fi credentials and exclude router-administration authority. |

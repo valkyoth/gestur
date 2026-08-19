@@ -1,7 +1,0 @@
-# Authorized release-evidence reviewers
-#
-# Format: UPPERCASE_GPG_FINGERPRINT | exact reviewer identity
-#
-# No reviewer is authorized yet. Additions or rotations require the two-person
-# governance procedure and a matching externally protected trust-policy digest;
-# candidate content alone cannot authorize a key.

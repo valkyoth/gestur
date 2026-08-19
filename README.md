@@ -100,9 +100,8 @@ tools. It never publishes a crate or creates a tag.
 - AI is optional and advisory; disabling it cannot break authoritative flows.
 - Every milestone is testable, documented, pentestable, and stops before tag
   creation.
-- Release signing trust is role-separated and externally pinned. Pentest/retest,
-  full local gates, documented CodeQL fixes, green CI, and the final tag check
-  complete in that order before any release claim.
+- Pentest/retest, full local gates, documented CodeQL fixes, green CI/CodeQL,
+  and the exact final tag check complete in that order before any release claim.
 - Release trains open at `v0.N.0` and advance through exact, numerically ordered
   patch stops; the detailed stop register and critical dependencies are
   machine-validated.
@@ -125,4 +124,3 @@ tools. It never publishes a crate or creates a tag.
 - [Platform support](docs/platform-support.md)
 - [Publishing policy](docs/publishing-policy.md)
 - [Release runbook](docs/release-runbook.md)
-- [Release trust governance](docs/release-trust-governance.md)

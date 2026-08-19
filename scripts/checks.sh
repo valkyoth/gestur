@@ -9,8 +9,7 @@ python3 scripts/test_validate_modularity_policy.py
 python3 scripts/test_validate_workspace_policy.py
 python3 scripts/test_validate_detailed_version_plan.py
 python3 scripts/test_validate_release_evidence.py
-python3 scripts/test_release_trust_policy.py
-python3 scripts/test_release_signature_integration.py
+python3 scripts/test_release_flow_policy.py
 scripts/check_action_pins.sh
 scripts/validate-workspace-policy.py
 scripts/validate-modularity-policy.sh

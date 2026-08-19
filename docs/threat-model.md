@@ -43,8 +43,8 @@ credential while still preserving emergency occupancy and controlled checkout.
   availability.
 - A dependency, toolchain, action, build environment, or release-channel
   supply-chain attacker.
-- A repository committer self-authorizing a review/tag signer, hiding code added
-  after a green pentest, or tagging an unapproved key or wrong commit.
+- A repository committer hiding code added after a green pentest or tagging the
+  wrong commit.
 - Resource-exhaustion attempts through forms, workflows, files, searches,
   notifications, retries, plugin execution, or offline replay.
 
@@ -63,8 +63,8 @@ credential while still preserving emergency occupancy and controlled checkout.
 - Outbound webhook/HTTP request to DNS and remote networks.
 - AI gateway to model provider and untrusted prompt content.
 - Build source to CI, artifact, tag, update, and deployment.
-- Candidate-controlled release registries to the protected external policy pin,
-  independent evidence signers, tag ruleset, and post-tag verification job.
+- Green pentested commit to release finalization, GitHub CI/CodeQL, annotated
+  tag, and post-tag verification job.
 
 ## Baseline Mitigations
 
@@ -87,11 +87,10 @@ credential while still preserving emergency occupancy and controlled checkout.
 - AI has no direct high-impact authority and receives typed tools only.
 - Tamper-evident audit roots replicated outside the mutable database.
 - Encrypted, bounded offline journals and explicit degraded-mode policy.
-- Exact tool/action pins, locked builds, source denial, SBOM, CI, CodeQL,
-  owner-operated pentest with third-party security tools, and signed release
-  evidence.
-- Role-separated externally pinned signing identities, explicit pentest-versus-
-  CodeQL change history, authorized tag fingerprints, and target validation.
+- Exact tool/action pins, locked builds, source denial, SBOM, CI, CodeQL, and
+  owner-operated pentesting.
+- Explicit pentest-versus-CodeQL change history, regression-test enforcement,
+  and exact tag-target validation.
 
 ## Foundation Residual Risk
 
@@ -115,5 +114,5 @@ not prove correctness or security.
 - Prompt injection, data exfiltration, tool confusion, and AI-disabled parity.
 - Database/Valkey/object-store/WAN/printer/controller partial failures.
 - Upgrade, migration, backup, restore, and rollback under fault injection.
-- Registry self-authorization, role/key reuse, unrecorded post-pentest changes,
-  unauthorized valid tag keys, and tags targeting non-evidence commits.
+- Unrecorded post-pentest changes, missing CodeQL regression tests, and tags
+  targeting the wrong release commit.

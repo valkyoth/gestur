@@ -11,7 +11,7 @@ case "$tag" in
 esac
 
 target="$(git rev-parse "refs/tags/${tag}^{commit}")"
-candidate="$(git rev-parse "${target}^")"
+candidate="$target"
 test "$(git rev-parse HEAD)" = "$target"
 
 python3 scripts/validate_detailed_version_plan.py \
