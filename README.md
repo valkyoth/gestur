@@ -9,6 +9,8 @@
   ·
   <a href="docs/RELEASE_PLAN.md">Release Plan</a>
   ·
+  <a href="docs/DETAILED_VERSION_PLAN.md">Detailed Versions</a>
+  ·
   <a href="docs/CRATE_PLAN.md">Crate Plan</a>
   ·
   <a href="docs/threat-model.md">Threat Model</a>
@@ -106,6 +108,7 @@ or creates a tag.
 - [Product vision](docs/PRODUCT_VISION.md)
 - [Implementation plan](docs/IMPLEMENTATION_PLAN.md)
 - [Release plan](docs/RELEASE_PLAN.md)
+- [Detailed version plan](docs/DETAILED_VERSION_PLAN.md)
 - [Crate plan](docs/CRATE_PLAN.md)
 - [Engineering policy](docs/engineering-policy.md)
 - [Testing policy](docs/testing-policy.md)

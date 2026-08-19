@@ -4,6 +4,9 @@ All notable Gestur changes are documented here.
 
 ## Unreleased
 
+- Strengthened the implementation, crate, and release plans with a
+  dependency-correct patch-version register, explicit real-system evidence,
+  optional hardware/regulatory gates, and a v1.0 acceptance ledger.
 - Made testing mandatory for every change, with explicit unit, integration,
   real-system/acceptance, and adversarial layers and no mock-only support claims.
 - Added cross-crate facade integration tests and an executable test-policy gate.

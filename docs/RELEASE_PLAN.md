@@ -6,6 +6,13 @@ This plan is intentionally granular. Every milestone must remain small enough to
 implement, review, test, document, pentest, and stop cleanly. Split a milestone
 or add patch versions whenever its risk or scope no longer fits one review pass.
 
+The 200 capability milestones below are release envelopes. The
+[Detailed version plan](DETAILED_VERSION_PLAN.md) is the authoritative register
+of mandatory patch-sized stops, dependency corrections, proof obligations, and
+the v1.0 acceptance ledger. A patch stop is a real release stop—not an informal
+task—and inherits every verification, pentest, documentation, and tag rule in
+this document.
+
 Tags use:
 
     v0.N.0      capability milestone
@@ -14,6 +21,44 @@ Tags use:
     v1.0.0      first serious production release
 
 No tag or workflow publishes a Cargo package.
+
+## Roadmap Authority And Change Control
+
+- A base milestone cannot close until every detailed stop assigned to it has
+  closed in version order.
+- Each stop has one outcome, context explaining why it exists, mandatory proof,
+  an evidence index entry, and the exact-commit pentest/retest stop below.
+- New work is inserted as the next free patch version under the owning base
+  milestone. Published version numbers are never reused or silently redefined.
+- A changed trust boundary reruns all affected cumulative campaigns even when
+  its local tests pass.
+- The implementation plan controls architectural dependency direction; the
+  detailed plan controls sequencing; this plan controls release governance.
+- Roadmap text is not implementation evidence. Release notes and the status
+  inventory must state only behavior present in the exact commit.
+
+## Corrected Dependency Invariants
+
+The detailed stops enforce these prerequisite chains:
+
+1. canonical IDs/time/encoding/bounds → command and event envelopes → storage;
+2. algorithm and key-provider contracts → PII envelope types → real key
+   providers → production PII enablement;
+3. transaction/idempotency/inbox/outbox contracts → adapters and effects;
+4. journey graph typing → privacy/capability flow analysis → publication →
+   deterministic execution → effect sagas;
+5. edge enrollment/identity/authority/signing → device adapters → offline
+   journal/reconciliation;
+6. shared capability/data-flow and SSRF rules → first-party connectors → Wasm
+   host reuse;
+7. AI leaf dependency and disclosure/DLP → advisory features → disabled-AI
+   parity qualification.
+
+No third-party crate is authorized by this roadmap. A capability that would
+otherwise require hand-written cryptography, TLS, OIDC, SQL, Unicode security,
+or a Wasm runtime remains blocked until maintainers explicitly change the
+dependency policy. “Planned” never means permission to implement an unsafe
+substitute.
 
 ## Release Principles
 
@@ -43,6 +88,9 @@ release notes must state those limitations plainly.
   release notes when behavior or trust changes.
 - Confirm Cargo metadata has no publishable package and no third-party crate.
 - Confirm no normal Rust source file exceeds 500 lines.
+- Validate the detailed stop's evidence index, source locks, support/non-claims,
+  and real-system proof. Never use a hard-coded repository test count as a
+  release claim.
 
 ## Pentest And Tag Stop
 
@@ -58,8 +106,10 @@ For every version:
 6. Confirm GitHub CI and CodeQL default setup are green.
 7. Create and push a signed tag only on explicit maintainer instruction.
 
-The Exit criteria in every section below include this complete rule. A pentest
-is not replaced by automated testing, fuzzing, formal methods, CodeQL, or audit.
+The Exit criteria in every section below and every detailed patch stop include
+this complete rule. A pentest is not replaced by automated testing, fuzzing,
+formal methods, CodeQL, or audit. Specialist cumulative reviews supplement the
+per-version pentest; they never reduce it.
 
 ## Phase Map
 

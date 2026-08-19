@@ -44,6 +44,13 @@ security, failure-isolation, scaling, or site-locality reason.
 Every active crate is no_std, forbids unsafe code, inherits EUPL-1.2, and has
 publishing disabled.
 
+The active type crates are contracts, not security implementations.
+`gestur-crypto-types` may describe algorithm profiles, key references, envelope
+metadata, and provider operations, but cannot contain home-grown cryptographic
+primitives or imply that production encryption exists. `gestur-api-types` and
+`gestur-events` converge on the canonical command/event envelopes before any
+storage, connector, edge, plugin, or AI effect path is admitted.
+
 ## Planned Portable Domain Crates
 
 Create these only with their matching milestone:
@@ -54,11 +61,15 @@ Create these only with their matching milestone:
 - gestur-forms: versioned forms and bounded submissions.
 - gestur-documents: document revisions and acceptance evidence.
 - gestur-retention: purpose-bound retention, holds, and erasure decisions.
+- gestur-privacy-vault: purpose-scoped PII envelopes, deny-read tombstones,
+  blind-index policy, and key-provider-independent erasure contracts.
 - gestur-evidence: evidence manifests and verification inputs.
 - gestur-audit: security/audit events and tamper-evident segment metadata.
 - gestur-directory: privacy-preserving host projection contracts.
 - gestur-notifications: routing, retry, and minimal-data message models.
 - gestur-credentials: badge, Wi-Fi, and physical-access lifecycle.
+- gestur-edge-protocol: signed authority epochs, commands, site packages,
+  ordered journals, acknowledgements, and reconciliation values.
 - gestur-emergency: occupancy snapshots and muster state.
 - gestur-connectors: capability names, request/response contracts, and health.
 - gestur-plugin-abi: WIT-facing stable value contracts.
@@ -85,6 +96,10 @@ These may use std but remain infrastructure-independent:
 Application crates depend on portable contracts, never concrete database,
 network, hardware, cloud, or vendor crates.
 
+The application dependency graph is checked so authoritative application and
+domain crates cannot depend on `gestur-ai-policy`. AI is always a leaf reached
+through an advisory boundary.
+
 ## Planned Infrastructure Boundary Crates
 
 A third-party crate remains prohibited. If a future dependency is admitted, it
@@ -99,11 +114,19 @@ Potential boundaries:
 - gestur-cache-valkey
 - gestur-blob-filesystem and gestur-blob-s3
 - gestur-plugin-host
+- gestur-egress-broker
 - gestur-connector-entra, gestur-connector-ldap
 - gestur-connector-smtp, gestur-connector-teams, gestur-connector-slack
 - gestur-connector-unifi, gestur-connector-ipp, gestur-connector-zpl
 - gestur-observability-host
 - gestur-key-provider-* adapters
+
+The zero-third-party rule remains in force for every boundary above. If a safe
+implementation is unavailable under that rule, the crate may contain contracts,
+fixtures, and disabled experimental seams only; it cannot claim support or grow
+a hand-written substitute for a mature security protocol. Admitting any future
+dependency requires an explicit policy change, threat/dependency review, source
+and license evidence, containment here, and maintainer approval.
 
 Vendor libraries that require a DLL, JVM, privileged daemon, or proprietary
 runtime run out of process in a gestur-vendor-agent. They never link into the

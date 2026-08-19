@@ -20,7 +20,9 @@ no_std workspace foundation. It is not a usable visitor management release.
   only unit or mock tests, before capabilities can be claimed as supported.
 - CI, security reporting, dependency policy, SBOM support, and CodeQL default
   setup documentation.
-- Granular implementation and release plans through v0.200.0 and v1.0.0.
+- Granular implementation and release plans through v0.200.0 and v1.0.0,
+  including dependency-correct patch stops and an evidence-addressable v1.0
+  acceptance ledger.
 - Linux, Windows, macOS, BSD, Android, and iOS verification posture.
 - A 500-line Rust source limit and no_std/unsafe/publishing/dependency gates.
 
