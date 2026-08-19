@@ -14,4 +14,5 @@ test -f docs/security-controls.md
 test -f docs/supply-chain-security.md
 test -f docs/unsafe-policy.md
 test -f docs/github-security-settings.md
+test -f security/release-reviewers.txt
 test ! -f PENTEST.md

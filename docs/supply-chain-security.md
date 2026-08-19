@@ -15,6 +15,10 @@ source policy, tool pins, action SHA pins, and SBOM still form release evidence.
 - Keep CI permissions read-only unless a reviewed job needs more.
 - Never store a crates.io credential while all packages are private.
 - Sign release tags and publish checksums/provenance only after the pentest stop.
+- Accept only roadmap-declared releases. Verify every predecessor as a distinct
+  signed annotated tag in strict Git ancestry order.
+- Freeze the candidate, then permit one evidence-only child commit whose signed
+  source/feasibility reviews and exact pentest report bind that candidate.
 
 ## Dependency Admission
 

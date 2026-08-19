@@ -111,6 +111,8 @@ Potential boundaries:
 
 - gestur-db-sqlite, gestur-db-postgres, gestur-db-mysql
 - gestur-http-host and gestur-tls-host
+- gestur-unicode-security
+- gestur-identity-oidc and gestur-identity-webauthn
 - gestur-cache-valkey
 - gestur-blob-filesystem and gestur-blob-s3
 - gestur-plugin-host
@@ -119,7 +121,7 @@ Potential boundaries:
 - gestur-connector-smtp, gestur-connector-teams, gestur-connector-slack
 - gestur-connector-unifi, gestur-connector-ipp, gestur-connector-zpl
 - gestur-observability-host
-- gestur-key-provider-* adapters
+- gestur-key-provider-* adapters, including gestur-key-provider-pkcs11
 
 The zero-third-party rule remains in force for every boundary above. If a safe
 implementation is unavailable under that rule, the crate may contain contracts,

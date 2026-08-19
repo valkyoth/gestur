@@ -10,6 +10,12 @@ import sys
 from datetime import date
 from pathlib import Path
 
+from validate_release_evidence import (
+    SignatureVerifier,
+    TagVerifier,
+    validate_release_evidence,
+)
+
 REGISTER_START = "<!-- detailed-stop-register:start -->"
 REGISTER_END = "<!-- detailed-stop-register:end -->"
 DEPENDENCY_START = "<!-- dependency-locks:start -->"
@@ -36,6 +42,8 @@ SOURCE_RE = re.compile(
 )
 
 REQUIRED_EDGES = {
+    "v0.10.6": {"v0.10.5"},
+    "v0.10.7": {"v0.10.5"},
     "v0.12.1": {"v0.10.2", "v0.11.1", "v0.11.3", "v0.11.5"},
     "v0.32.1": {"v0.3.6", "v0.3.7", "v0.11.5", "v0.30.1"},
     "v0.46.1": {"v0.45.6"},
@@ -82,7 +90,8 @@ REQUIRED_SOURCES = {
     "wcag": ("https://www.w3.org/TR/WCAG22/", 180),
     "nist-800-63": ("https://csrc.nist.gov/pubs/sp/800/63/4/final", 90),
     "nist-800-88": ("https://csrc.nist.gov/pubs/sp/800/88/r2/final", 90),
-    "eu-ai-act": ("https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng", 30),
+    "eu-ai-act-base": ("https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng", 30),
+    "eu-ai-act-amendment": ("https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng", 30),
     "gdpr": ("https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng", 180),
     "ccpa-cpra": ("https://cppa.ca.gov/regulations/", 30),
     "eidas": ("https://eur-lex.europa.eu/eli/reg/2014/910/2024-10-18/eng", 90),
@@ -378,14 +387,14 @@ def validate(
     return errors
 
 
-def evidence_file(repository: Path, relative: str) -> Path | None:
-    root = repository.resolve()
-    candidate = (root / relative).resolve()
-    try:
-        candidate.relative_to(root)
-    except ValueError:
-        return None
-    return candidate
+def boundary_plan_digest(plan_text: str, boundary: str) -> str:
+    errors: list[str] = []
+    section = marked_section(plan_text, BOUNDARY_START, BOUNDARY_END, errors)
+    line = next(
+        (item for item in section.splitlines() if item.startswith(f"- {boundary} |")),
+        "",
+    )
+    return hashlib.sha256(f"{line}\n".encode()).hexdigest()
 
 
 def validate_release(
@@ -393,17 +402,27 @@ def validate_release(
     release: str,
     repository: Path,
     *,
+    candidate: str | None = None,
     today: date | None = None,
+    signature_verifier: SignatureVerifier | None = None,
+    tag_verifier: TagVerifier | None = None,
 ) -> list[str]:
     errors: list[str] = []
-    current_date = today or date.today()
     if not VERSION_RE.fullmatch(release):
         return [f"invalid release version: {release}"]
 
+    train_section = marked_section(plan_text, TRAIN_START, TRAIN_END, errors)
     boundary_section = marked_section(
         plan_text, BOUNDARY_START, BOUNDARY_END, errors
     )
+    declarations = parse_train_declarations(train_section, errors)
     boundaries = parse_boundaries(boundary_section, errors)
+    declared_versions = set(declarations) | {"v1.0.0"}
+    for stops in declarations.values():
+        declared_versions.update(stops)
+    if release not in declared_versions:
+        errors.append(f"release is not declared by the roadmap: {release}")
+
     release_key = version_key(release)
     for boundary, entry in boundaries.items():
         status = entry["status"]
@@ -413,45 +432,28 @@ def validate_release(
             errors.append(
                 f"{boundary}: {release} requires qualified feasibility, found {status}"
             )
-        if release_key < version_key(str(entry["decision_by"])) or status == "pending":
-            continue
-        relative = str(entry["evidence"])
-        path = evidence_file(repository, relative)
-        if path is None or not path.is_file():
-            errors.append(f"{boundary}: missing feasibility evidence file {relative}")
-            continue
-        content = path.read_text(encoding="utf-8")
-        if f"Boundary: {boundary}\n" not in content:
-            errors.append(f"{boundary}: feasibility evidence names the wrong boundary")
-        if f"Status: {status.upper()}\n" not in content:
-            errors.append(f"{boundary}: feasibility evidence status does not match ledger")
-        if not re.search(r"^Reviewed-Commit: [0-9a-f]{40}$", content, re.MULTILINE):
-            errors.append(f"{boundary}: feasibility evidence lacks reviewed commit")
-
-    attestation_relative = f"evidence/source-freshness/{release}.md"
-    attestation = evidence_file(repository, attestation_relative)
-    if attestation is None or not attestation.is_file():
-        errors.append(f"missing source-freshness attestation: {attestation_relative}")
+    if errors:
         return errors
-    content = attestation.read_text(encoding="utf-8")
-    if "Status: PASS\n" not in content:
-        errors.append(f"{attestation_relative}: status is not PASS")
-    date_match = re.search(r"^Date: (\d{4}-\d{2}-\d{2})$", content, re.MULTILINE)
-    if date_match is None:
-        errors.append(f"{attestation_relative}: missing ISO Date")
-    else:
-        try:
-            checked = date.fromisoformat(date_match.group(1))
-        except ValueError:
-            errors.append(f"{attestation_relative}: invalid ISO Date")
-        else:
-            age = (current_date - checked).days
-            if age < 0 or age > 7:
-                errors.append(f"{attestation_relative}: attestation is not within seven days")
-    expected_digest = source_lock_digest(plan_text)
-    if f"Source-Lock-Digest: {expected_digest}\n" not in content:
-        errors.append(f"{attestation_relative}: source-lock digest does not match")
-    return errors
+
+    kwargs = {}
+    if signature_verifier is not None:
+        kwargs["signature_verifier"] = signature_verifier
+    if tag_verifier is not None:
+        kwargs["tag_verifier"] = tag_verifier
+    boundary_digests = {
+        boundary: boundary_plan_digest(plan_text, boundary) for boundary in boundaries
+    }
+    return validate_release_evidence(
+        release,
+        repository,
+        candidate,
+        declared_versions,
+        boundaries,
+        boundary_digests,
+        source_lock_digest(plan_text),
+        today=today,
+        **kwargs,
+    )
 
 
 def main() -> int:
@@ -459,6 +461,7 @@ def main() -> int:
     parser.add_argument("--plan", type=Path, default=Path("docs/DETAILED_VERSION_PLAN.md"))
     parser.add_argument("--release-plan", type=Path, default=Path("docs/RELEASE_PLAN.md"))
     parser.add_argument("--release")
+    parser.add_argument("--candidate")
     parser.add_argument("--repository", type=Path, default=Path("."))
     args = parser.parse_args()
 
@@ -469,7 +472,12 @@ def main() -> int:
     )
     if args.release and not errors:
         errors.extend(
-            validate_release(plan_text, args.release, args.repository)
+            validate_release(
+                plan_text,
+                args.release,
+                args.repository,
+                candidate=args.candidate,
+            )
         )
     if errors:
         for error in errors:

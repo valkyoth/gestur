@@ -13,12 +13,16 @@ esac
 version="${tag#v}"
 notes="release-notes/RELEASE_NOTES_${version}.md"
 report="security/pentest/${tag}.md"
+candidate="$(git rev-parse HEAD^)"
 
 test ! -f PENTEST.md
 test -f "$notes"
 test -s sbom/gestur.spdx.json
 scripts/generate-sbom.sh --check
-python3 scripts/validate_detailed_version_plan.py --release "$tag" --repository .
+python3 scripts/validate_detailed_version_plan.py \
+    --release "$tag" \
+    --candidate "$candidate" \
+    --repository .
 
 if [ ! -f "$report" ]; then
     echo "missing independent pentest report: $report" >&2
@@ -33,8 +37,7 @@ grep -Eq '^Date: [0-9]{4}-[0-9]{2}-[0-9]{2}$' "$report"
 
 reviewed="$(sed -n 's/^Reviewed-Commit: //p' "$report")"
 git cat-file -e "${reviewed}^{commit}"
-test "$(git rev-parse HEAD^)" = "$reviewed"
-test "$(git diff --name-only "$reviewed" HEAD)" = "$report"
+test "$candidate" = "$reviewed"
 
 if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
     echo "tag already exists locally: $tag" >&2

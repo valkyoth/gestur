@@ -61,6 +61,12 @@ Accepted corrections:
   machine-readable release inputs rather than prose-only promises;
 - Wi-Fi, UniFi, access, multi-printer, and cross-provider credential lifecycle
   work receives explicit real-controller or real-device proof.
+- review evidence is bound to a real candidate, exact scope, support digest,
+  reviewer key, and verified detached signature;
+- only declared releases can enter the gate, and every earlier declared release
+  must form a distinct, signed, ancestor-ordered tag chain;
+- legal source sets retain the base instrument and each applicable amendment or
+  authoritative consolidation instead of treating one amendment as the whole.
 
 Accepted with qualification:
 
@@ -108,6 +114,10 @@ Rejected or corrected:
    boundary is `qualified` with evidence.
 10. Source locks carry individual revision and freshness metadata; every
     release attests the exact lock-set digest while it is still current.
+11. The evidence commit changes only the exact pentest, signed source review,
+    and signed feasibility artifacts authorized for its candidate.
+12. Release candidates are members of the declared base/stop set; every lower
+    declared version has a distinct signed tag in strict ancestry order.
 
 ## Machine-Enforced Boundary Feasibility Ledger
 
@@ -116,8 +126,17 @@ or later, each entry must be either `qualified` or `blocked` with a reviewed
 evidence file. A release at or after `required-by` passes only when that entry
 is `qualified`; a blocked boundary stays unreachable. This mechanism does not
 authorize a dependency or a hand-written security substitute. Each evidence
-file records `Boundary`, matching uppercase `Status`, and the 40-hex
-`Reviewed-Commit`; release validation checks all three.
+file records `Boundary`, matching uppercase `Status`, real `Reviewed-Commit`,
+`Boundary-Plan-Digest`, complete `Scope`, attributable `Reviewer` and
+`Reviewer-Key`, support `Evidence` plus SHA-256 `Evidence-Digest`, and a verified
+detached `Signature`. The reviewed commit must exist and precede the candidate;
+any later change under the declared scope invalidates the decision. At the
+consuming release, scope must include the boundary's planned implementation
+crate. `Scope` is a comma-separated list of repository-relative paths without
+spaces. The reviewer identity/fingerprint pair must be uniquely authorized by
+the candidate's `security/release-reviewers.txt`; a self-declared signing key is
+not trust. The signed record and support artifact are added only in the final
+evidence commit, which may not change implementation or roadmap content.
 
 <!-- boundary-feasibility:start -->
 - sqlite | decision-by=v0.10.2 | required-by=v0.12.1 | status=pending | evidence=none
@@ -138,6 +157,8 @@ referenced stop exists, and rejects a prerequisite that does not precede its
 consumer.
 
 <!-- dependency-locks:start -->
+- v0.10.6 <- v0.10.5
+- v0.10.7 <- v0.10.5
 - v0.12.1 <- v0.10.2, v0.11.1, v0.11.3, v0.11.5
 - v0.32.1 <- v0.3.6, v0.3.7, v0.11.5, v0.30.1
 - v0.46.1 <- v0.45.6
@@ -183,7 +204,7 @@ adding, or moving a stop requires an explicit reviewable declaration change.
 - v0.7.0: v0.7.1
 - v0.8.0: v0.8.1
 - v0.9.0: v0.9.1
-- v0.10.0: v0.10.1, v0.10.2, v0.10.3, v0.10.4
+- v0.10.0: v0.10.1, v0.10.2, v0.10.3, v0.10.4, v0.10.5, v0.10.6, v0.10.7
 - v0.11.0: v0.11.1, v0.11.2, v0.11.3, v0.11.4, v0.11.5
 - v0.12.0: v0.12.1
 - v0.13.0: v0.13.1
@@ -401,6 +422,9 @@ adding, or moving a stop requires an explicit reviewable declaration change.
 | v0.10.2 | Publish the production-boundary feasibility and blocker ledger under the zero-third-party rule. | SQLite, PostgreSQL, MySQL, TLS, OIDC, WebAuthn, Unicode security, PKCS#11, and Wasm each name a reviewable first-party/platform/process path plus real-test environment, or remain explicitly blocked and unreachable. |
 | v0.10.3 | Define the shared network destination and egress-safety contract before network clients. | DNS rebinding, CNAME, redirect, dual-stack, private/metadata address, proxy, TLS-name, timeout, and size fixtures define fail-closed behavior. |
 | v0.10.4 | Establish the per-version independent-pentest capacity plan without reducing scope or frequency. | Approved budget owner, provider and specialist coverage, booking lead times, clean-retest SLA, contingency capacity, and schedule gates cover every declared stop; absent capacity blocks scheduling. |
+| v0.10.5 | Define the cryptographically attributable review-evidence envelope used by feasibility and source gates. | Real temporary Git history and disposable reviewer key; nonexistent/non-ancestor commit, wrong scope, later scoped change, plan/support digest mutation, untrusted/ambiguous key, forged/wrong-key signature, merge evidence commit, and non-evidence changes all fail. |
+| v0.10.6 | Enforce the closed declared-release set and strict signed predecessor-tag ancestry. | Real temporary Git graph; undeclared release, missing/lightweight/unsigned/reused/out-of-order/non-ancestor predecessor tag, reused candidate commit, and pre-existing target tag fail; a complete signed chain passes. |
+| v0.10.7 | Define authoritative multi-instrument legal source sets and amendment/consolidation relationships. | Base act, applicable amendments, consolidation state, revision dates, precedence notes, freshness, and qualified applicability review are complete; missing-base and amendment-only fixtures fail. |
 
 Phase exit: canonical envelopes and crypto-provider contracts are independently
 reviewed before storage/PII implementation; the foundation remains
@@ -788,17 +812,23 @@ validator fails closed. The owner must recheck the primary source and update
 both prose and metadata when a lock expires or a newer revision appears.
 
 Every release additionally requires
-`evidence/source-freshness/vX.Y.Z.md` with `Status: PASS`, an ISO `Date`, and the
-SHA-256 `Source-Lock-Digest` printed by the validator. The attestation may be no
-more than seven days old and must describe changed-source review. A current
-date alone is insufficient when the recorded revision is wrong.
+`evidence/source-freshness/vX.Y.Z.md` with `Status: PASS`, ISO `Date`, exact
+candidate `Reviewed-Commit`, attributable `Reviewer` and `Reviewer-Key`, the
+SHA-256 `Source-Lock-Digest` printed by the validator, support `Evidence` and
+its SHA-256 `Evidence-Digest`, plus a verified detached `Signature`. The
+reviewer/key pair must be uniquely authorized in the candidate's reviewer
+registry. The attestation may be no more than seven days old. It and its support
+record are added in the evidence-only child commit, and the later signed release
+tag binds the full evidence set. A current date or digest without attributable
+review is insufficient.
 
 <!-- source-locks:start -->
 - semver | revision=2.0.0 | checked=2026-08-19 | max-age-days=365 | url=https://semver.org/
 - wcag | revision=REC-WCAG22-20241212 | checked=2026-08-19 | max-age-days=180 | url=https://www.w3.org/TR/WCAG22/
 - nist-800-63 | revision=SP-800-63-4-final-2025-07 | checked=2026-08-19 | max-age-days=90 | url=https://csrc.nist.gov/pubs/sp/800/63/4/final
 - nist-800-88 | revision=SP-800-88r2-final-2025-09-note-2026-07-17 | checked=2026-08-19 | max-age-days=90 | url=https://csrc.nist.gov/pubs/sp/800/88/r2/final
-- eu-ai-act | revision=Regulation-EU-2026-1744 | checked=2026-08-19 | max-age-days=30 | url=https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng
+- eu-ai-act-base | revision=Regulation-EU-2024-1689 | checked=2026-08-19 | max-age-days=30 | url=https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng
+- eu-ai-act-amendment | revision=Regulation-EU-2026-1744 | checked=2026-08-19 | max-age-days=30 | url=https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng
 - gdpr | revision=Regulation-EU-2016-679 | checked=2026-08-19 | max-age-days=180 | url=https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng
 - ccpa-cpra | revision=effective-2026-01-01 | checked=2026-08-19 | max-age-days=30 | url=https://cppa.ca.gov/regulations/
 - eidas | revision=consolidated-2024-10-18 | checked=2026-08-19 | max-age-days=90 | url=https://eur-lex.europa.eu/eli/reg/2014/910/2024-10-18/eng
@@ -825,10 +855,13 @@ date alone is insufficient when the recorded revision is wrong.
 - [NIST SP 800-88 Rev. 2](https://csrc.nist.gov/pubs/sp/800/88/r2/final) is the
   current media-sanitization input and does not make cryptographic erasure
   automatic or complete when plaintext/key copies survive.
-- [Regulation (EU) 2026/1744](https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng)
-  changes parts of the AI Act application schedule. The consolidated current
-  text and exact applicability must be rechecked by qualified reviewers; the
-  roadmap does not freeze the superseded original schedule.
+- [Regulation (EU) 2024/1689](https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng)
+  is the AI Act base instrument, while
+  [Regulation (EU) 2026/1744](https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng)
+  amends parts of its application schedule. Both remain in the source set until
+  an authoritative consolidation is pinned; exact applicability and later
+  amendments require qualified review. An amending act is never treated as the
+  complete underlying law.
 - [GDPR Regulation (EU) 2016/679](https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng)
   is the primary EU privacy source lock. EDPB and national guidance may refine
   implementation, but Gestur does not turn technical controls into a compliance

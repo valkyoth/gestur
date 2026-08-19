@@ -34,6 +34,9 @@ No tag or workflow publishes a Cargo package.
 - Every base train has a machine-enforced detailed-stop declaration, including
   an explicit `none`. The declaration and detailed register must match exactly,
   so accidental row deletion, addition, or reassignment fails closed.
+- A requested release must be one declared base, one stop in that base's exact
+  declaration, or `v1.0.0`. Every lower declared release must have a distinct,
+  cryptographically valid annotated tag in ancestor order before the candidate.
 - Every v0 patch release states its compatibility impact explicitly. Gestur is
   in Semantic Versioning major-zero development; from v1.0.0 onward, fixes,
   compatible features, and breaking changes use patch, minor, and major
@@ -75,6 +78,11 @@ blocked and unreachable. This feasibility gate does not itself authorize a
 dependency or weaken the zero-third-party rule. Its machine-readable ledger is
 checked again at release time: pending decisions block `v0.10.2`, and a later
 consumer cannot release unless its exact boundary is qualified with evidence.
+The evidence names an existing ancestor commit and complete reviewed scope,
+binds the exact boundary-plan and supporting-evidence digests, and carries an
+attributable detached signature from a candidate-authorized reviewer key. A
+later scoped change invalidates it; the consuming release must cover the planned
+boundary implementation crate.
 
 ## Release Principles
 
@@ -120,6 +128,11 @@ release notes must state those limitations plainly.
 - Run the boundary-feasibility release check. From `v0.10.2`, every decision
   must carry reviewed evidence; a consuming adapter requires `qualified`, not
   merely a dependency edge to the feasibility milestone.
+- Validate the exact candidate and evidence-only child commit. Source and
+  feasibility records require real Git ancestry, scope invalidation checks,
+  support digests, reviewer identity/key, and a valid detached signature.
+- Reject undeclared releases and require every lower declared version's signed
+  annotated tag to be a distinct ancestor in numeric order.
 
 ## Pentest And Tag Stop
 
@@ -128,14 +141,19 @@ For every version:
 1. Complete deliverables and local verification.
 2. Confirm the reserved independent provider, scope, specialist coverage,
    budget, and clean-retest window are still available.
-3. Stop with: vX.Y.Z implementation stop reached. Run pentest for this exact
-   commit.
-4. Record temporary findings only in ignored root PENTEST.md.
-5. Fix all findings, add regression tests, update evidence, remove PENTEST.md,
-   and rerun every gate.
-6. Add a permanent exact-commit PASS digest only after independent clean retest.
-7. Confirm GitHub CI and CodeQL default setup are green.
-8. Create and push a signed tag only on explicit maintainer instruction.
+3. Freeze the implementation candidate and stop with: vX.Y.Z implementation
+   stop reached. Run pentest for this exact commit.
+4. Record temporary findings only in ignored root PENTEST.md. Fix every finding,
+   add regression tests, and repeat from a new candidate until clean.
+5. Review sources and applicable feasibility scopes against the final candidate;
+   produce attributable signed records and support digests.
+6. Create one child evidence commit containing only the exact pentest report,
+   current source review, and required feasibility records/support/signatures.
+7. Run the release gate against its parent candidate. It rejects any other
+   changed path, invalid review, undeclared version, or broken predecessor chain.
+8. Confirm GitHub CI and CodeQL default setup are green.
+9. Create and push a signed tag on the evidence commit only on explicit
+   maintainer instruction.
 
 The Exit criteria in every section below and every detailed patch stop include
 this complete rule. A pentest is not replaced by automated testing, fuzzing,
@@ -176,6 +194,9 @@ Their full deliverables and mandatory proof live in the detailed register.
 | --- | --- |
 | v0.10.2 | Record reviewed qualified/blocked feasibility outcomes for each production boundary. |
 | v0.10.4 | Reserve provider, specialist, budget, lead-time, retest, and contingency pentest capacity without waivers. |
+| v0.10.5 | Bind feasibility and source evidence to real commits, scope, digests, reviewer keys, and verified detached signatures. |
+| v0.10.6 | Reject undeclared releases and enforce distinct signed predecessor tags in strict ancestry order. |
+| v0.10.7 | Keep legal base instruments, applicable amendments, and consolidation state as one governed source set. |
 | v0.99.1 | Establish one authoritative lifecycle for badge, Wallet, network, access, and parking projections. |
 | v0.100.1 | Qualify multi-printer routing and failover on two real supported devices. |
 | v0.101.1 | Bound guest Wi-Fi credentials and exclude router-administration authority. |

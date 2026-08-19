@@ -4,6 +4,11 @@ All notable Gestur changes are documented here.
 
 ## Unreleased
 
+- Bound release review evidence to real Git ancestry, reviewed scopes, support
+  digests, attributable detached signatures, an evidence-only commit, and the
+  complete declared signed predecessor-tag chain; added real-Git mutation tests.
+- Locked the EU AI Act base regulation and its 2026 amending regulation as one
+  governed source set rather than treating the amendment as the complete act.
 - Corrected major-zero release-train chronology, expanded every grouped roadmap
   range into unique ordered versions, split remaining multi-deliverable stops,
   and added tested fail-closed validation for stop ownership, ordering,

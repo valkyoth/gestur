@@ -2,29 +2,39 @@
 
 1. Before scheduling the version, reserve the independent pentest provider,
    necessary specialists, approved budget, lead time, clean-retest window, and
-   contingency capacity recorded by the `v0.10.4` operating plan. Missing
-   capacity blocks scheduling and never waives a pentest.
-2. Finish exactly one version's bounded deliverables.
-3. Update tests, documentation, threat model, changelog, and release notes.
-4. Recheck every source lock against its primary source. Update changed or
-   expired revisions, obtain qualified review where needed, and write the
-   seven-day release attestation at `evidence/source-freshness/vX.Y.Z.md` using
-   the validator's exact source-lock digest.
-5. Run scripts/checks.sh, cargo deny check, cargo audit, SBOM verification, and
-   the version-specific gate.
-6. Run live Rust/tool/action freshness checks and the release-time boundary
-   feasibility check. From `v0.10.2`, decisions need reviewed evidence; a
-   consuming adapter requires its boundary to be qualified.
-7. Stop and report: vX.Y.Z implementation stop reached. Run pentest for this
-   exact commit.
-8. The maintainer records temporary findings in root PENTEST.md.
-9. Fix every finding, add regression tests, update evidence, delete PENTEST.md,
-   and repeat all gates.
-10. After a clean independent retest, add security/pentest/vX.Y.Z.md with the
-   exact reviewed commit, date, tester, scope, and PASS status.
-11. Confirm GitHub CI and CodeQL default setup are green.
-12. Create and push a signed tag only after explicit maintainer instruction.
+   contingency capacity recorded by `v0.10.4`. Missing capacity blocks work.
+2. Confirm vX.Y.Z is a declared base, declared stop, or `v1.0.0`; fetch the full
+   tag history and verify every lower declared version is a distinct signed
+   annotated tag in strict ancestor order.
+3. Finish exactly one version's bounded deliverables. Update tests,
+   documentation, threat model, changelog, release notes, and evidence index.
+4. Run scripts/checks.sh, cargo deny check, cargo audit, SBOM verification,
+   version-specific tests, and live Rust/tool/action freshness checks.
+5. Freeze this commit as the candidate and report: vX.Y.Z implementation stop
+   reached. Run pentest for this exact commit.
+6. Record temporary findings only in ignored root PENTEST.md. Fix every finding,
+   add regression tests, and repeat steps 3–5 with a new candidate until the
+   independent clean retest passes.
+7. Recheck every source lock and governed source set against primary sources.
+   Record changed-source analysis under `evidence/source-freshness/reviews/`.
+8. Write `evidence/source-freshness/vX.Y.Z.md` with PASS status, date, exact
+   candidate, source-lock digest, reviewer identity/key fingerprint, support
+   path/digest, and detached signature made by that key. The identity/key pair
+   must be uniquely authorized in the candidate's reviewer registry.
+9. From `v0.10.2`, do the same for each decided feasibility record. Declare the
+   complete reviewed scope; a consuming release must include its boundary crate.
+   Any scoped change after `Reviewed-Commit` requires a new review and signature.
+10. Create exactly one child evidence commit containing only the permanent
+    pentest report and the authorized source/feasibility records, support files,
+    and detached signatures. Do not change code, plans, or release notes there.
+11. Run `scripts/validate-release-readiness.sh vX.Y.Z`. It binds evidence to the
+    parent candidate, validates signatures/digests/scopes, and rechecks the
+    declared signed predecessor chain.
+12. Confirm GitHub CI and CodeQL default setup are green.
+13. Create and push a signed tag on the evidence commit only after explicit
+    maintainer instruction.
 
 No step publishes a Cargo package. A failed check, unresolved finding, missing
-evidence, stale source or tool, unavailable pentest capacity, dirty release
-metadata, or ambiguous reviewed commit fails closed.
+or self-asserted evidence, stale source or tool, unavailable pentest capacity,
+undeclared version, broken tag ancestry, unauthorized evidence-commit change,
+or ambiguous reviewed commit fails closed.

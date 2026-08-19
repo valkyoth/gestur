@@ -1,0 +1,7 @@
+# Authorized release-evidence reviewers
+#
+# Format: UPPERCASE_GPG_FINGERPRINT | exact reviewer identity
+#
+# No reviewer is authorized yet. Additions or rotations belong in the frozen
+# implementation candidate before review, require maintainer approval, and are
+# covered by the candidate's tests and independent pentest.

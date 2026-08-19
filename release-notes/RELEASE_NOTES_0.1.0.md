@@ -25,6 +25,10 @@ no_std workspace foundation. It is not a usable visitor management release.
   acceptance ledger.
 - Machine-enforced detailed stop ordering, ownership, dependency prerequisites,
   mandatory proof, source locks, and correct `v0.N.0` then `v0.N.P` chronology.
+- A fail-closed release-evidence gate that rejects undeclared versions, broken
+  signed predecessor-tag ancestry, self-asserted reviews, stale reviewed scopes,
+  invalid support digests/signatures, and non-evidence changes after candidate
+  freeze.
 - Linux, Windows, macOS, BSD, Android, and iOS verification posture.
 - A 500-line Rust source limit and no_std/unsafe/publishing/dependency gates.
 
@@ -36,7 +40,8 @@ no_std workspace foundation. It is not a usable visitor management release.
 - Algorithm types are metadata only and must not be read as a cryptographic
   implementation claim.
 - A tag remains blocked until independent pentest findings are resolved and the
-  exact reviewed commit has permanent PASS evidence.
+  exact reviewed candidate has permanent attributable PASS evidence in its
+  evidence-only child commit.
 
 ## Verification
 

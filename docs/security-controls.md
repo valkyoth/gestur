@@ -16,6 +16,12 @@ Status: v0.1.0 foundation controls.
 - Read-only CI permissions and full-SHA GitHub Action pins.
 - cargo-deny, cargo-audit, SPDX SBOM, and CodeQL default setup policy.
 - Exact-commit independent pentest stop before every tag.
+- Closed declared-release set; distinct signed predecessor tags must form a
+  strict ancestor chain, and only an evidence child commit may follow candidate
+  freeze.
+- Source and feasibility reviews bind real commits, scoped-change invalidation,
+  support digests, candidate-authorized reviewer key fingerprints, and verified
+  detached signatures.
 - EUPL-1.2 internal workspace with no registry publishing path.
 
 ## Designed Now, Implemented Later

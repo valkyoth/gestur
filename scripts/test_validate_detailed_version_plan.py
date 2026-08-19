@@ -3,9 +3,7 @@
 
 from __future__ import annotations
 
-import re
 import sys
-import tempfile
 import unittest
 from datetime import date
 from pathlib import Path
@@ -38,52 +36,6 @@ class DetailedVersionPlanValidatorTests(unittest.TestCase):
         self.assertTrue(
             any(fragment in error for error in errors),
             f"expected {fragment!r} in {errors!r}",
-        )
-
-    def qualify_boundaries(self, plan: str) -> str:
-        def replacement(match: re.Match[str]) -> str:
-            boundary = match.group(1)
-            return (
-                f"- {boundary} | decision-by={match.group(2)} "
-                f"| required-by={match.group(3)} | status=qualified "
-                f"| evidence=evidence/feasibility/{boundary}.md"
-            )
-
-        section_errors: list[str] = []
-        section = validator.marked_section(
-            plan,
-            validator.BOUNDARY_START,
-            validator.BOUNDARY_END,
-            section_errors,
-        )
-        self.assertEqual(section_errors, [])
-        updated = "\n".join(
-            replacement(match) if (match := validator.BOUNDARY_RE.fullmatch(line)) else line
-            for line in section.split("\n")
-        )
-        return plan.replace(section, updated)
-
-    def write_release_evidence(
-        self, root: Path, plan: str, release: str, *, blocked: set[str] | None = None
-    ) -> None:
-        blocked = blocked or set()
-        for boundary in validator.REQUIRED_BOUNDARIES:
-            path = root / "evidence" / "feasibility" / f"{boundary}.md"
-            path.parent.mkdir(parents=True, exist_ok=True)
-            status = "BLOCKED" if boundary in blocked else "QUALIFIED"
-            path.write_text(
-                f"Boundary: {boundary}\n"
-                f"Status: {status}\n"
-                f"Reviewed-Commit: {'a' * 40}\n",
-                encoding="utf-8",
-            )
-        attestation = root / "evidence" / "source-freshness" / f"{release}.md"
-        attestation.parent.mkdir(parents=True, exist_ok=True)
-        attestation.write_text(
-            "Status: PASS\n"
-            f"Date: {date.today().isoformat()}\n"
-            f"Source-Lock-Digest: {validator.source_lock_digest(plan)}\n",
-            encoding="utf-8",
         )
 
     def test_repository_plan_is_valid(self) -> None:
@@ -171,6 +123,17 @@ class DetailedVersionPlanValidatorTests(unittest.TestCase):
             self.plan.replace(f"{line}\n", ""), "missing source locks: ofac"
         )
 
+    def test_ai_act_base_and_amendment_are_both_required(self) -> None:
+        base = next(
+            line
+            for line in self.plan.splitlines()
+            if line.startswith("- eu-ai-act-base |")
+        )
+        self.assert_rejected(
+            self.plan.replace(f"{base}\n", ""),
+            "missing source locks: eu-ai-act-base",
+        )
+
     def test_stale_source_lock_fails_closed(self) -> None:
         mutated = self.plan.replace(
             "- semver | revision=2.0.0 | checked=2026-08-19 | max-age-days=365",
@@ -187,64 +150,27 @@ class DetailedVersionPlanValidatorTests(unittest.TestCase):
         mutated = self.plan.replace(validator.REGISTER_END, "", 1)
         self.assert_rejected(mutated, "expected exactly one")
 
-    def test_release_feasibility_passes_with_qualified_evidence(self) -> None:
-        plan = self.qualify_boundaries(self.plan)
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            self.write_release_evidence(root, plan, "v0.10.2")
-            self.assertEqual(
-                validator.validate_release(plan, "v0.10.2", root),
-                [],
-            )
-
     def test_pending_boundary_blocks_decision_release(self) -> None:
-        plan = self.qualify_boundaries(self.plan)
-        qualified = (
-            "- sqlite | decision-by=v0.10.2 | required-by=v0.12.1 "
-            "| status=qualified | evidence=evidence/feasibility/sqlite.md"
-        )
-        pending = (
-            "- sqlite | decision-by=v0.10.2 | required-by=v0.12.1 "
-            "| status=pending | evidence=none"
-        )
-        plan = plan.replace(qualified, pending)
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            self.write_release_evidence(root, plan, "v0.10.2")
-            errors = validator.validate_release(plan, "v0.10.2", root)
+        errors = validator.validate_release(self.plan, "v0.10.2", REPOSITORY)
         self.assertTrue(
             any("sqlite: pending feasibility decision blocks" in error for error in errors)
         )
 
     def test_blocked_boundary_blocks_consuming_release(self) -> None:
-        plan = self.qualify_boundaries(self.plan)
-        qualified = (
+        pending = (
             "- sqlite | decision-by=v0.10.2 | required-by=v0.12.1 "
-            "| status=qualified | evidence=evidence/feasibility/sqlite.md"
+            "| status=pending | evidence=none"
         )
-        blocked = qualified.replace("status=qualified", "status=blocked")
-        plan = plan.replace(qualified, blocked)
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            self.write_release_evidence(root, plan, "v0.12.1", blocked={"sqlite"})
-            errors = validator.validate_release(plan, "v0.12.1", root)
+        blocked = (
+            "- sqlite | decision-by=v0.10.2 | required-by=v0.12.1 "
+            "| status=blocked | evidence=evidence/feasibility/sqlite.md"
+        )
+        errors = validator.validate_release(
+            self.plan.replace(pending, blocked), "v0.12.1", REPOSITORY
+        )
         self.assertTrue(
             any("sqlite: v0.12.1 requires qualified feasibility" in error for error in errors)
         )
-
-    def test_source_attestation_digest_mismatch_fails(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            path = root / "evidence" / "source-freshness" / "v0.1.0.md"
-            path.parent.mkdir(parents=True)
-            path.write_text(
-                "Status: PASS\n"
-                f"Date: {date.today().isoformat()}\n"
-                f"Source-Lock-Digest: {'0' * 64}\n",
-                encoding="utf-8",
-            )
-            errors = validator.validate_release(self.plan, "v0.1.0", root)
-        self.assertTrue(any("source-lock digest does not match" in error for error in errors))
 
 
 if __name__ == "__main__":
