@@ -55,6 +55,12 @@ Accepted corrections:
   boundaries receive explicit adversarial and real-system proof;
 - Wallet, UWB, LPR, elevator, delivery, contractor, export-control, sanctions,
   restore, update, and release-candidate gaps receive named stops.
+- every base train declares its exact detailed stops, including `none`, so a
+  deleted row cannot silently weaken the roadmap;
+- production-boundary feasibility decisions and source revisions become
+  machine-readable release inputs rather than prose-only promises;
+- Wi-Fi, UniFi, access, multi-printer, and cross-provider credential lifecycle
+  work receives explicit real-controller or real-device proof.
 
 Accepted with qualification:
 
@@ -78,6 +84,9 @@ Rejected or corrected:
   silently exempted.
 - Specialist cumulative reviews do not replace Gestur's independent
   exact-commit pentest and clean-retest requirement at every version.
+- Per-version pentesting remains mandatory. Provider capacity, specialist
+  coverage, retest lead time, and budget must be reserved before work is
+  scheduled; unavailable capacity blocks the train and never waives a test.
 - Dependency admission is not pre-approved. `v0.10.2` must prove a safe path
   under the current policy or keep the affected capability blocked; only a
   separate, explicit maintainer policy change could alter that result.
@@ -94,6 +103,33 @@ Rejected or corrected:
 7. `v0.87.1` egress rules are reused by first-party connectors and the later
    Wasm broker; Wasm never becomes the source of those rules.
 8. AI remains a leaf from `v0.141.0`; `v0.150.1` proves disabled-AI parity.
+9. `v0.10.2` records a reviewed `qualified` or `blocked` decision for every
+   listed production boundary; a consuming release cannot pass unless its
+   boundary is `qualified` with evidence.
+10. Source locks carry individual revision and freshness metadata; every
+    release attests the exact lock-set digest while it is still current.
+
+## Machine-Enforced Boundary Feasibility Ledger
+
+`pending` is valid only while planning before `v0.10.2`. To release `v0.10.2`
+or later, each entry must be either `qualified` or `blocked` with a reviewed
+evidence file. A release at or after `required-by` passes only when that entry
+is `qualified`; a blocked boundary stays unreachable. This mechanism does not
+authorize a dependency or a hand-written security substitute. Each evidence
+file records `Boundary`, matching uppercase `Status`, and the 40-hex
+`Reviewed-Commit`; release validation checks all three.
+
+<!-- boundary-feasibility:start -->
+- sqlite | decision-by=v0.10.2 | required-by=v0.12.1 | status=pending | evidence=none
+- postgresql | decision-by=v0.10.2 | required-by=v0.13.1 | status=pending | evidence=none
+- mysql | decision-by=v0.10.2 | required-by=v0.14.1 | status=pending | evidence=none
+- unicode-security | decision-by=v0.10.2 | required-by=v0.42.1 | status=pending | evidence=none
+- tls | decision-by=v0.10.2 | required-by=v0.71.1 | status=pending | evidence=none
+- oidc | decision-by=v0.10.2 | required-by=v0.71.1 | status=pending | evidence=none
+- webauthn | decision-by=v0.10.2 | required-by=v0.72.1 | status=pending | evidence=none
+- wasm | decision-by=v0.10.2 | required-by=v0.112.1 | status=pending | evidence=none
+- pkcs11 | decision-by=v0.10.2 | required-by=v0.167.1 | status=pending | evidence=none
+<!-- boundary-feasibility:end -->
 
 ## Machine-Enforced Dependency Locks
 
@@ -111,6 +147,17 @@ consumer.
 - v0.87.1 <- v0.10.2, v0.10.3, v0.19.1
 - v0.92.1 <- v0.3.5, v0.27.1, v0.91.1, v0.92.0
 - v0.93.1 <- v0.92.4
+- v0.99.1 <- v0.98.4
+- v0.100.1 <- v0.93.1, v0.97.1
+- v0.101.1 <- v0.92.4
+- v0.102.1 <- v0.101.1
+- v0.103.1 <- v0.92.4, v0.101.1, v0.102.1
+- v0.104.1 <- v0.101.1, v0.102.1
+- v0.105.1 <- v0.103.1, v0.104.1
+- v0.107.1 <- v0.106.1
+- v0.108.1 <- v0.107.1
+- v0.109.5 <- v0.99.1, v0.105.1, v0.108.1
+- v0.110.2 <- v0.109.5, v0.110.1
 - v0.111.1 <- v0.46.2, v0.87.1
 - v0.112.1 <- v0.10.2, v0.111.1
 - v0.133.1 <- v0.92.4
@@ -119,6 +166,215 @@ consumer.
 - v0.168.1 <- v0.58.2, v0.140.1, v0.166.1, v0.167.1, v0.167.2
 - v0.200.1 <- v0.199.1
 <!-- dependency-locks:end -->
+
+## Machine-Enforced Train Stop Declarations
+
+Every base train declares its complete detailed-stop set or none. The
+validator cross-checks these declarations against the register, so deleting,
+adding, or moving a stop requires an explicit reviewable declaration change.
+
+<!-- train-stop-declarations:start -->
+- v0.1.0: v0.1.1
+- v0.2.0: v0.2.1
+- v0.3.0: v0.3.1, v0.3.2, v0.3.3, v0.3.4, v0.3.5, v0.3.6, v0.3.7
+- v0.4.0: v0.4.1
+- v0.5.0: v0.5.1
+- v0.6.0: v0.6.1
+- v0.7.0: v0.7.1
+- v0.8.0: v0.8.1
+- v0.9.0: v0.9.1
+- v0.10.0: v0.10.1, v0.10.2, v0.10.3, v0.10.4
+- v0.11.0: v0.11.1, v0.11.2, v0.11.3, v0.11.4, v0.11.5
+- v0.12.0: v0.12.1
+- v0.13.0: v0.13.1
+- v0.14.0: v0.14.1
+- v0.15.0: v0.15.1
+- v0.16.0: v0.16.1
+- v0.17.0: v0.17.1
+- v0.18.0: v0.18.1
+- v0.19.0: v0.19.1
+- v0.20.0: v0.20.1
+- v0.21.0: v0.21.1
+- v0.22.0: none
+- v0.23.0: v0.23.1
+- v0.24.0: none
+- v0.25.0: none
+- v0.26.0: none
+- v0.27.0: v0.27.1
+- v0.28.0: none
+- v0.29.0: v0.29.1
+- v0.30.0: v0.30.1
+- v0.31.0: v0.31.1
+- v0.32.0: v0.32.1
+- v0.33.0: none
+- v0.34.0: v0.34.1, v0.34.2
+- v0.35.0: none
+- v0.36.0: none
+- v0.37.0: none
+- v0.38.0: none
+- v0.39.0: none
+- v0.40.0: v0.40.1, v0.40.2, v0.40.3
+- v0.41.0: v0.41.1
+- v0.42.0: v0.42.1
+- v0.43.0: v0.43.1
+- v0.44.0: none
+- v0.45.0: v0.45.1, v0.45.2, v0.45.3, v0.45.4, v0.45.5, v0.45.6
+- v0.46.0: v0.46.1, v0.46.2
+- v0.47.0: v0.47.1, v0.47.2, v0.47.3, v0.47.4, v0.47.5, v0.47.6, v0.47.7
+- v0.48.0: v0.48.1, v0.48.2, v0.48.3, v0.48.4, v0.48.5, v0.48.6, v0.48.7, v0.48.8, v0.48.9
+- v0.49.0: v0.49.1, v0.49.2, v0.49.3, v0.49.4, v0.49.5, v0.49.6, v0.49.7, v0.49.8, v0.49.9, v0.49.10, v0.49.11, v0.49.12, v0.49.13, v0.49.14, v0.49.15, v0.49.16, v0.49.17, v0.49.18, v0.49.19, v0.49.20
+- v0.50.0: v0.50.1, v0.50.2, v0.50.3
+- v0.51.0: v0.51.1
+- v0.52.0: v0.52.1
+- v0.53.0: v0.53.1
+- v0.54.0: v0.54.1
+- v0.55.0: v0.55.1
+- v0.56.0: v0.56.1, v0.56.2, v0.56.3, v0.56.4, v0.56.5
+- v0.57.0: v0.57.1
+- v0.58.0: v0.58.1, v0.58.2, v0.58.3
+- v0.59.0: v0.59.1
+- v0.60.0: v0.60.1
+- v0.61.0: v0.61.1
+- v0.62.0: v0.62.1
+- v0.63.0: v0.63.1
+- v0.64.0: v0.64.1
+- v0.65.0: v0.65.1
+- v0.66.0: v0.66.1
+- v0.67.0: v0.67.1
+- v0.68.0: v0.68.1
+- v0.69.0: v0.69.1
+- v0.70.0: v0.70.1
+- v0.71.0: v0.71.1
+- v0.72.0: v0.72.1
+- v0.73.0: none
+- v0.74.0: v0.74.1
+- v0.75.0: v0.75.1
+- v0.76.0: v0.76.1
+- v0.77.0: v0.77.1
+- v0.78.0: v0.78.1
+- v0.79.0: v0.79.1
+- v0.80.0: v0.80.1
+- v0.81.0: v0.81.1
+- v0.82.0: none
+- v0.83.0: v0.83.1
+- v0.84.0: v0.84.1
+- v0.85.0: v0.85.1
+- v0.86.0: v0.86.1
+- v0.87.0: v0.87.1, v0.87.2
+- v0.88.0: none
+- v0.89.0: none
+- v0.90.0: none
+- v0.91.0: v0.91.1
+- v0.92.0: v0.92.1, v0.92.2, v0.92.3, v0.92.4
+- v0.93.0: v0.93.1
+- v0.94.0: v0.94.1
+- v0.95.0: v0.95.1
+- v0.96.0: v0.96.1
+- v0.97.0: v0.97.1
+- v0.98.0: v0.98.1, v0.98.2, v0.98.3, v0.98.4
+- v0.99.0: v0.99.1
+- v0.100.0: v0.100.1
+- v0.101.0: v0.101.1
+- v0.102.0: v0.102.1
+- v0.103.0: v0.103.1
+- v0.104.0: v0.104.1
+- v0.105.0: v0.105.1
+- v0.106.0: v0.106.1, v0.106.2, v0.106.3
+- v0.107.0: v0.107.1
+- v0.108.0: v0.108.1
+- v0.109.0: v0.109.1, v0.109.2, v0.109.3, v0.109.4, v0.109.5
+- v0.110.0: v0.110.1, v0.110.2
+- v0.111.0: v0.111.1
+- v0.112.0: v0.112.1
+- v0.113.0: v0.113.1
+- v0.114.0: v0.114.1, v0.114.2, v0.114.3, v0.114.4, v0.114.5, v0.114.6, v0.114.7, v0.114.8, v0.114.9, v0.114.10, v0.114.11, v0.114.12, v0.114.13, v0.114.14, v0.114.15, v0.114.16
+- v0.115.0: v0.115.1
+- v0.116.0: v0.116.1
+- v0.117.0: v0.117.1
+- v0.118.0: v0.118.1
+- v0.119.0: none
+- v0.120.0: v0.120.1
+- v0.121.0: none
+- v0.122.0: v0.122.1
+- v0.123.0: none
+- v0.124.0: v0.124.1
+- v0.125.0: v0.125.1
+- v0.126.0: none
+- v0.127.0: none
+- v0.128.0: none
+- v0.129.0: none
+- v0.130.0: v0.130.1, v0.130.2
+- v0.131.0: v0.131.1, v0.131.2
+- v0.132.0: none
+- v0.133.0: v0.133.1
+- v0.134.0: v0.134.1
+- v0.135.0: v0.135.1, v0.135.2
+- v0.136.0: v0.136.1, v0.136.2, v0.136.3
+- v0.137.0: none
+- v0.138.0: none
+- v0.139.0: none
+- v0.140.0: v0.140.1
+- v0.141.0: v0.141.1
+- v0.142.0: v0.142.1
+- v0.143.0: v0.143.1
+- v0.144.0: v0.144.1
+- v0.145.0: v0.145.1
+- v0.146.0: v0.146.1
+- v0.147.0: v0.147.1
+- v0.148.0: v0.148.1
+- v0.149.0: v0.149.1
+- v0.150.0: v0.150.1
+- v0.151.0: v0.151.1
+- v0.152.0: v0.152.1
+- v0.153.0: v0.153.1
+- v0.154.0: v0.154.1
+- v0.155.0: v0.155.1
+- v0.156.0: v0.156.1
+- v0.157.0: v0.157.1
+- v0.158.0: v0.158.1
+- v0.159.0: v0.159.1
+- v0.160.0: v0.160.1
+- v0.161.0: v0.161.1
+- v0.162.0: v0.162.1
+- v0.163.0: v0.163.1, v0.163.2
+- v0.164.0: v0.164.1, v0.164.2, v0.164.3, v0.164.4, v0.164.5
+- v0.165.0: v0.165.1
+- v0.166.0: v0.166.1
+- v0.167.0: v0.167.1, v0.167.2
+- v0.168.0: v0.168.1
+- v0.169.0: v0.169.1
+- v0.170.0: none
+- v0.171.0: v0.171.1
+- v0.172.0: v0.172.1
+- v0.173.0: v0.173.1
+- v0.174.0: v0.174.1
+- v0.175.0: v0.175.1
+- v0.176.0: v0.176.1, v0.176.2, v0.176.3, v0.176.4
+- v0.177.0: v0.177.1
+- v0.178.0: none
+- v0.179.0: v0.179.1
+- v0.180.0: v0.180.1
+- v0.181.0: none
+- v0.182.0: none
+- v0.183.0: none
+- v0.184.0: v0.184.1, v0.184.2
+- v0.185.0: v0.185.1
+- v0.186.0: v0.186.1
+- v0.187.0: v0.187.1
+- v0.188.0: v0.188.1
+- v0.189.0: v0.189.1
+- v0.190.0: v0.190.1
+- v0.191.0: v0.191.1
+- v0.192.0: v0.192.1
+- v0.193.0: v0.193.1
+- v0.194.0: v0.194.1
+- v0.195.0: v0.195.1
+- v0.196.0: v0.196.1
+- v0.197.0: v0.197.1, v0.197.2, v0.197.3
+- v0.198.0: v0.198.1, v0.198.2, v0.198.3
+- v0.199.0: v0.199.1
+- v0.200.0: v0.200.1
+<!-- train-stop-declarations:end -->
 
 <!-- detailed-stop-register:start -->
 
@@ -144,6 +400,7 @@ consumer.
 | v0.10.1 | Validate threat model v1 against abuse cases and control-to-test traceability. | Independent review maps each trust boundary and control to current or explicitly future evidence. |
 | v0.10.2 | Publish the production-boundary feasibility and blocker ledger under the zero-third-party rule. | SQLite, PostgreSQL, MySQL, TLS, OIDC, WebAuthn, Unicode security, PKCS#11, and Wasm each name a reviewable first-party/platform/process path plus real-test environment, or remain explicitly blocked and unreachable. |
 | v0.10.3 | Define the shared network destination and egress-safety contract before network clients. | DNS rebinding, CNAME, redirect, dual-stack, private/metadata address, proxy, TLS-name, timeout, and size fixtures define fail-closed behavior. |
+| v0.10.4 | Establish the per-version independent-pentest capacity plan without reducing scope or frequency. | Approved budget owner, provider and specialist coverage, booking lead times, clean-retest SLA, contingency capacity, and schedule gates cover every declared stop; absent capacity blocks scheduling. |
 
 Phase exit: canonical envelopes and crypto-provider contracts are independently
 reviewed before storage/PII implementation; the foundation remains
@@ -318,15 +575,25 @@ restore assumptions are demonstrated.
 | v0.98.2 | Add Apple Wallet NFC profile only behind entitlement/certificate/terminal qualification. | Vendor approval plus real compatible terminal/device; cloned/replayed/stale pass tests. |
 | v0.98.3 | Add opaque revocable Google Wallet pass profile with QR fallback. | Real supported Android devices; expiry/revocation/update/privacy. |
 | v0.98.4 | Add Google Smart Tap only behind certification and compatible terminal qualification. | Certified test path plus real compatible terminal/device and replay/revoke tests. |
+| v0.99.1 | Define one authoritative lifecycle for badge, Wallet, network, access, and parking credential projections. | Model and fault histories prove status, expiry, revoke, provider ambiguity, and late acknowledgement cannot resurrect or contradict the authoritative lifecycle. |
+| v0.100.1 | Qualify deterministic multi-printer routing and bounded failover. | Two real supported printers or vendor-faithful devices; offline, jam, incompatible capability, duplicate, reroute, ambiguous result, and recovery histories never double-print silently. |
+| v0.101.1 | Define least-authority guest Wi-Fi credential and capability semantics. | Tenant/site/network isolation, scope, duration, reveal, renewal, audit, unsupported-controller, and denial tests prove no router-administration authority leaks. |
 | v0.102.1 | Make every issued secret non-exportable where possible and short-lived by policy. | Rotation, revoke, log/crash-dump/cache redaction, and provider ambiguity tests. |
+| v0.103.1 | Qualify the UniFi guest-network reference connector through the edge agent. | Real isolated supported controller and access point; least-privilege account, version matrix, issue/revoke, retry, outage, ambiguous result, cross-site denial, and reconciliation tests. |
+| v0.104.1 | Qualify bounded Wi-Fi QR provisioning as a presentation of an existing credential, never a new authority source. | Real supported Android and iOS devices; schema, escaping, encoding, hidden-network, expiry, screenshot/disclosure, accessibility, and manual fallback tests. |
+| v0.105.1 | Implement automatic Wi-Fi expiry/revocation delivery and reconciliation. | Real supported controller; crash at request/apply/ack, retry, controller outage, stale result, rotation, and recovery prove an expired credential cannot remain silently active. |
 | v0.106.1 | Isolate native/vendor access adapters in a narrow authenticated agent. | Compromised adapter cannot mint grants, widen site/zone/time, or reach control-plane credentials. |
 | v0.106.2 | Add the turnstile observation and effect contract. | Physical/vendor lab; direction, tailgating ambiguity, duplicate, obstruction, emergency, and manual fallback tests. |
 | v0.106.3 | Add the destination-only elevator request contract. | Physical/vendor lab; no generic movement API, floor scope, duplicate, outage, emergency, and manual fallback tests. |
+| v0.107.1 | Define zone, direction, and time-bounded physical-access entitlements independently of any vendor API. | Policy/model histories cover daylight changes, overlapping grants, anti-passback ambiguity, emergency override, expiry, revoke, and cross-zone/tenant denial. |
+| v0.108.1 | Implement physical-access expiry/revocation delivery and reconciliation through the isolated agent. | Real supported controller or contracted vendor lab; crash/retry/outage, stale grant, ambiguous acknowledgement, manual intervention, and recovery converge without widening access. |
 | v0.109.1 | Add the Apple UWB observation profile. | Real supported phones/accessories; consent, capability, ranging error, relay, replay, staleness, and manual fallback. |
 | v0.109.2 | Add the Android UWB observation profile. | Real supported phones/accessories; permission, capability, ranging error, relay, replay, staleness, and manual fallback. |
 | v0.109.3 | Add privacy-gated LPR observation profile. | Real approved camera/vendor environment; plate minimization, confidence, correction, retention, spoof, and manual fallback. |
 | v0.109.4 | Add parking entitlement lifecycle independent of raw plate observation. | Grant/revoke/expiry/reconcile and plate-change tests. |
+| v0.109.5 | Reconcile every provider projection against the authoritative credential lifecycle without guessing an ambiguous device state. | Assembled Wallet, Wi-Fi, access, and parking providers or their qualified real labs; drift, stale callbacks, outage, partial revoke, retry, and repair produce attributable convergence or explicit quarantine. |
 | v0.110.1 | Add edge/device compromise and checkout-revocation cumulative campaign. | Lost node, cloned key, controller outage, stale grant, ambiguous device state, and eventual reconciled revoke. |
+| v0.110.2 | Prove checkout and expiry revoke or quarantine every issued visit credential as one assembled invariant. | Real supported Wallet/device/controller paths plus provider outage and delayed recovery; no credential remains silently usable, while emergency/manual fallbacks stay attributable. |
 
 Phase exit: edge authority and checkout revocation survive assembled hardware and
 fault campaigns. Optional modalities remain disabled outside their qualified
@@ -515,9 +782,38 @@ artifacts, dates, revisions, and reviewers for every statement:
 
 ## Current Source Locks
 
-Checked 2026-08-19. These sources justify roadmap inputs, not compliance claims.
-Recheck the latest stable revision and errata when the owning stop begins and at
-release qualification.
+These sources justify roadmap inputs, not compliance claims. Each lock records
+the revision observed, its check date, and the maximum age allowed before the
+validator fails closed. The owner must recheck the primary source and update
+both prose and metadata when a lock expires or a newer revision appears.
+
+Every release additionally requires
+`evidence/source-freshness/vX.Y.Z.md` with `Status: PASS`, an ISO `Date`, and the
+SHA-256 `Source-Lock-Digest` printed by the validator. The attestation may be no
+more than seven days old and must describe changed-source review. A current
+date alone is insufficient when the recorded revision is wrong.
+
+<!-- source-locks:start -->
+- semver | revision=2.0.0 | checked=2026-08-19 | max-age-days=365 | url=https://semver.org/
+- wcag | revision=REC-WCAG22-20241212 | checked=2026-08-19 | max-age-days=180 | url=https://www.w3.org/TR/WCAG22/
+- nist-800-63 | revision=SP-800-63-4-final-2025-07 | checked=2026-08-19 | max-age-days=90 | url=https://csrc.nist.gov/pubs/sp/800/63/4/final
+- nist-800-88 | revision=SP-800-88r2-final-2025-09-note-2026-07-17 | checked=2026-08-19 | max-age-days=90 | url=https://csrc.nist.gov/pubs/sp/800/88/r2/final
+- eu-ai-act | revision=Regulation-EU-2026-1744 | checked=2026-08-19 | max-age-days=30 | url=https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng
+- gdpr | revision=Regulation-EU-2016-679 | checked=2026-08-19 | max-age-days=180 | url=https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng
+- ccpa-cpra | revision=effective-2026-01-01 | checked=2026-08-19 | max-age-days=30 | url=https://cppa.ca.gov/regulations/
+- eidas | revision=consolidated-2024-10-18 | checked=2026-08-19 | max-age-days=90 | url=https://eur-lex.europa.eu/eli/reg/2014/910/2024-10-18/eng
+- ofac | revision=live-list-service | checked=2026-08-19 | max-age-days=30 | url=https://ofac.treasury.gov/sanctions-list-service
+- ear | revision=eCFR-2026-08-19 | checked=2026-08-19 | max-age-days=30 | url=https://www.ecfr.gov/current/title-15/subtitle-B/chapter-VII/subchapter-C
+- itar | revision=eCFR-2026-08-19 | checked=2026-08-19 | max-age-days=30 | url=https://www.ecfr.gov/current/title-22/chapter-I/subchapter-M
+- fips-201 | revision=FIPS-201-3-final-2022-01 | checked=2026-08-19 | max-age-days=180 | url=https://csrc.nist.gov/pubs/fips/201-3/final
+- oidc-core | revision=1.0-errata-set-2-2023-12-15 | checked=2026-08-19 | max-age-days=180 | url=https://openid.net/specs/openid-connect-core-1_0.html
+- rfc-5545 | revision=RFC-5545-2008-09 | checked=2026-08-19 | max-age-days=365 | url=https://www.rfc-editor.org/rfc/rfc5545
+- rfc-9421 | revision=RFC-9421-2024-02 | checked=2026-08-19 | max-age-days=365 | url=https://www.rfc-editor.org/rfc/rfc9421
+- rfc-3161 | revision=RFC-3161-2001-08 | checked=2026-08-19 | max-age-days=365 | url=https://www.rfc-editor.org/rfc/rfc3161
+- apple-nearby-interaction | revision=live-2026-08-19 | checked=2026-08-19 | max-age-days=90 | url=https://developer.apple.com/documentation/nearbyinteraction
+- android-ranging | revision=live-2026-08-19 | checked=2026-08-19 | max-age-days=90 | url=https://developer.android.com/develop/connectivity/ranging
+- google-smart-tap | revision=live-2026-08-19 | checked=2026-08-19 | max-age-days=90 | url=https://developers.google.com/wallet/smart-tap
+<!-- source-locks:end -->
 
 - [Semantic Versioning 2.0.0](https://semver.org/) defines numeric precedence
   and immutability of released contents. Gestur's v0.y.z train convention uses
@@ -529,9 +825,10 @@ release qualification.
 - [NIST SP 800-88 Rev. 2](https://csrc.nist.gov/pubs/sp/800/88/r2/final) is the
   current media-sanitization input and does not make cryptographic erasure
   automatic or complete when plaintext/key copies survive.
-- [EU AI Act enforcement update](https://digital-strategy.ec.europa.eu/en/news/commission-starts-enforcing-ai-act-rules-and-new-transparency-requirements-2-august)
-  confirms the relevant 2 August 2026 enforcement/transparency date; exact
-  applicability still requires qualified review.
+- [Regulation (EU) 2026/1744](https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng)
+  changes parts of the AI Act application schedule. The consolidated current
+  text and exact applicability must be rechecked by qualified reviewers; the
+  roadmap does not freeze the superseded original schedule.
 - [GDPR Regulation (EU) 2016/679](https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng)
   is the primary EU privacy source lock. EDPB and national guidance may refine
   implementation, but Gestur does not turn technical controls into a compliance
@@ -555,7 +852,7 @@ release qualification.
   for the optional U.S. federal employee/contractor PIV profile. It is not a
   universal contractor-credential standard; other deployments must pin their
   own governing employment, safety, access, and identity sources.
-- [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html),
+- [OpenID Connect Core 1.0 incorporating errata set 2](https://openid.net/specs/openid-connect-core-1_0.html),
   [RFC 5545](https://www.rfc-editor.org/rfc/rfc5545),
   [RFC 9421](https://www.rfc-editor.org/rfc/rfc9421), and
   [RFC 3161](https://www.rfc-editor.org/rfc/rfc3161) anchor identity, calendar,

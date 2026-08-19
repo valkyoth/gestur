@@ -18,6 +18,7 @@ test ! -f PENTEST.md
 test -f "$notes"
 test -s sbom/gestur.spdx.json
 scripts/generate-sbom.sh --check
+python3 scripts/validate_detailed_version_plan.py --release "$tag" --repository .
 
 if [ ! -f "$report" ]; then
     echo "missing independent pentest report: $report" >&2

@@ -31,6 +31,9 @@ No tag or workflow publishes a Cargo package.
   an evidence index entry, and the exact-commit pentest/retest stop below.
 - New work is inserted as the next free patch version under the owning base
   milestone. Published version numbers are never reused or silently redefined.
+- Every base train has a machine-enforced detailed-stop declaration, including
+  an explicit `none`. The declaration and detailed register must match exactly,
+  so accidental row deletion, addition, or reassignment fails closed.
 - Every v0 patch release states its compatibility impact explicitly. Gestur is
   in Semantic Versioning major-zero development; from v1.0.0 onward, fixes,
   compatible features, and breaking changes use patch, minor, and major
@@ -69,7 +72,9 @@ Before the first production adapter, `v0.10.2` must record a safe,
 independently reviewable first-party/platform/process path and real test
 environment for every mature protocol/runtime boundary, or mark its later stops
 blocked and unreachable. This feasibility gate does not itself authorize a
-dependency or weaken the zero-third-party rule.
+dependency or weaken the zero-third-party rule. Its machine-readable ledger is
+checked again at release time: pending decisions block `v0.10.2`, and a later
+consumer cannot release unless its exact boundary is qualified with evidence.
 
 ## Release Principles
 
@@ -78,6 +83,13 @@ updated security/privacy documentation, release notes, exact tool/dependency
 evidence, a clean implementation stop, an independent pentest of the exact
 commit, remediation and clean retest, green GitHub CI and CodeQL default setup,
 and an explicitly authorized signed tag.
+
+The pentest obligation is also a capacity gate. Before scheduling a train,
+maintainers reserve its external provider, required specialist coverage,
+budget, lead time, clean-retest window, and contingency capacity. A scheduling
+or funding shortfall blocks the release; it never reduces pentest scope,
+frequency, independence, or exact-commit binding. `v0.10.4` establishes and
+tests this operating plan before later trains expand the external surface.
 
 A milestone is deployable or exercisable at its declared maturity. Early
 versions may expose only libraries, test harnesses, or a non-production binary;
@@ -102,20 +114,28 @@ release notes must state those limitations plainly.
 - Validate the detailed stop's evidence index, source locks, support/non-claims,
   and real-system proof. Never use a hard-coded repository test count as a
   release claim.
+- Fail when a source lock exceeds its per-source maximum age. Add a release-time
+  freshness attestation that binds the current source-lock digest, and obtain
+  qualified review when a legal/regulatory revision affects scope or claims.
+- Run the boundary-feasibility release check. From `v0.10.2`, every decision
+  must carry reviewed evidence; a consuming adapter requires `qualified`, not
+  merely a dependency edge to the feasibility milestone.
 
 ## Pentest And Tag Stop
 
 For every version:
 
 1. Complete deliverables and local verification.
-2. Stop with: vX.Y.Z implementation stop reached. Run pentest for this exact
+2. Confirm the reserved independent provider, scope, specialist coverage,
+   budget, and clean-retest window are still available.
+3. Stop with: vX.Y.Z implementation stop reached. Run pentest for this exact
    commit.
-3. Record temporary findings only in ignored root PENTEST.md.
-4. Fix all findings, add regression tests, update evidence, remove PENTEST.md,
+4. Record temporary findings only in ignored root PENTEST.md.
+5. Fix all findings, add regression tests, update evidence, remove PENTEST.md,
    and rerun every gate.
-5. Add a permanent exact-commit PASS digest only after independent clean retest.
-6. Confirm GitHub CI and CodeQL default setup are green.
-7. Create and push a signed tag only on explicit maintainer instruction.
+6. Add a permanent exact-commit PASS digest only after independent clean retest.
+7. Confirm GitHub CI and CodeQL default setup are green.
+8. Create and push a signed tag only on explicit maintainer instruction.
 
 The Exit criteria in every section below and every detailed patch stop include
 this complete rule. A pentest is not replaced by automated testing, fuzzing,
@@ -146,6 +166,26 @@ per-version pentest; they never reduce it.
 | v0.171.0–v0.180.0 | Advanced security |
 | v0.181.0–v0.190.0 | Operational maturity |
 | v0.191.0–v0.200.0 | Release qualification |
+
+## Gap-Closure Version Index
+
+These are bounded additions to the existing trains, not replacement milestones.
+Their full deliverables and mandatory proof live in the detailed register.
+
+| Version | Added context |
+| --- | --- |
+| v0.10.2 | Record reviewed qualified/blocked feasibility outcomes for each production boundary. |
+| v0.10.4 | Reserve provider, specialist, budget, lead-time, retest, and contingency pentest capacity without waivers. |
+| v0.99.1 | Establish one authoritative lifecycle for badge, Wallet, network, access, and parking projections. |
+| v0.100.1 | Qualify multi-printer routing and failover on two real supported devices. |
+| v0.101.1 | Bound guest Wi-Fi credentials and exclude router-administration authority. |
+| v0.103.1 | Qualify the UniFi reference connector against a real isolated controller and access point. |
+| v0.104.1 | Qualify Wi-Fi QR presentation on real supported Android and iOS devices. |
+| v0.105.1 | Prove automatic Wi-Fi expiry/revocation and reconciliation on a real controller. |
+| v0.107.1 | Define vendor-independent zone, direction, and time-bounded access entitlements. |
+| v0.108.1 | Prove physical-access revoke/expiry convergence in a controller or contracted vendor lab. |
+| v0.109.5 | Reconcile provider projections without guessing ambiguous device state. |
+| v0.110.2 | Prove checkout/expiry revocation across every issued credential as an assembled invariant. |
 
 # Foundation
 
