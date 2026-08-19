@@ -110,12 +110,88 @@ class ReleaseSignatureIntegrationTests(unittest.TestCase):
                     directory=repository,
                 )
                 run(["git", "tag", "-a", "-m", "unsigned", "v0.1.1"], directory=repository)
-                self.assertTrue(
-                    validator.default_tag_verifier(repository, "v0.1.0")
+                self.assertEqual(
+                    validator.default_tag_verifier(repository, "v0.1.0"),
+                    fingerprint,
                 )
-                self.assertFalse(
+                self.assertIsNone(
                     validator.default_tag_verifier(repository, "v0.1.1")
                 )
+
+    def test_arbitrary_valid_tag_key_is_not_release_authority(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            fingerprint = self.create_key(root / "gnupg")
+            with patch.dict(os.environ, {"GNUPGHOME": str(root / "gnupg")}):
+                repository = root / "repository"
+                repository.mkdir()
+                fixture = fixtures.GitFixture(repository)
+                fixture.commit("v0.1.0")
+                fixture.run("tag", "-s", "-u", fingerprint, "-m", "v0.1.0", "v0.1.0")
+                candidate = fixture.commit("candidate")
+                fixtures.write_source_evidence(fixture, "v0.1.1", candidate)
+                fixture.commit("evidence")
+                errors = fixtures.validate(
+                    fixture,
+                    "v0.1.1",
+                    candidate,
+                    {"v0.1.0", "v0.1.1"},
+                    tag_verifier=validator.default_tag_verifier,
+                )
+        self.assertTrue(any("signer is not authorized" in error for error in errors))
+
+    def test_authorized_external_pentest_signature_passes_full_gate(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            fingerprint = self.create_key(root / "gnupg")
+            repository = root / "repository"
+            repository.mkdir()
+            fixture = fixtures.GitFixture(repository)
+            fixture.write(
+                "security/external-pentesters.txt",
+                f"{fingerprint} | Independent Pentester\n",
+            )
+            candidate = fixture.commit("candidate")
+            fixtures.write_source_evidence(fixture, "v0.1.0", candidate)
+            fixtures.write_pentest_evidence(
+                fixture,
+                "v0.1.0",
+                candidate,
+                tester_key=fingerprint,
+                signature="placeholder\n",
+            )
+            attestation = repository / "security/pentest/v0.1.0.md"
+            signature = repository / "security/pentest/v0.1.0.md.asc"
+            signature.unlink()
+            with patch.dict(os.environ, {"GNUPGHOME": str(root / "gnupg")}):
+                run(
+                    [
+                        "gpg",
+                        "--batch",
+                        "--armor",
+                        "--detach-sign",
+                        "--local-user",
+                        fingerprint,
+                        "--output",
+                        str(signature),
+                        str(attestation),
+                    ]
+                )
+                fixture.commit("evidence")
+
+                def verify(selected: Path, record: Path) -> str | None:
+                    if "pentest" in record.parts:
+                        return validator.default_signature_verifier(selected, record)
+                    return fixtures.valid_signature(selected, record)
+
+                errors = fixtures.validate(
+                    fixture,
+                    "v0.1.0",
+                    candidate,
+                    {"v0.1.0"},
+                    signature_verifier=verify,
+                )
+        self.assertEqual(errors, [])
 
     def test_merge_evidence_commit_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -158,7 +234,7 @@ class ReleaseSignatureIntegrationTests(unittest.TestCase):
             errors = fixtures.validate(
                 fixture, "v0.1.0", candidate, {"v0.1.0"}
             )
-        self.assertTrue(any("not authorized by the candidate" in error for error in errors))
+        self.assertTrue(any("duplicate fingerprint" in error for error in errors))
 
 
 if __name__ == "__main__":

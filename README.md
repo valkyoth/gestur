@@ -100,6 +100,8 @@ or creates a tag.
 - AI is optional and advisory; disabling it cannot break authoritative flows.
 - Every milestone is testable, documented, pentestable, and stops before tag
   creation.
+- Release trust is role-separated and externally pinned; signed pentest evidence
+  and the newly created tag are verified before any release claim.
 - Release trains open at `v0.N.0` and advance through exact, numerically ordered
   patch stops; the detailed stop register and critical dependencies are
   machine-validated.
@@ -122,3 +124,4 @@ or creates a tag.
 - [Platform support](docs/platform-support.md)
 - [Publishing policy](docs/publishing-policy.md)
 - [Release runbook](docs/release-runbook.md)
+- [Release trust governance](docs/release-trust-governance.md)

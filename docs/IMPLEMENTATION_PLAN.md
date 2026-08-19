@@ -42,6 +42,11 @@ site edge and isolated native vendor agent.
 - Documentation, release notes, threat changes, and pentest evidence are part
   of the implementation.
 - No release tag before an independent exact-commit pentest and clean retest.
+- Release reviewer, external-pentester, and tag-signer keys are separate roles;
+  candidate registry changes cannot take effect without an externally protected
+  digest update and two-person governance.
+- Pentest results and release tags require attributable signatures, digest-bound
+  artifacts, authorized fingerprints, and post-tag verification.
 
 ## Architectural Decisions To Freeze
 

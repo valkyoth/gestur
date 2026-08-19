@@ -40,10 +40,12 @@ SOURCE_RE = re.compile(
     r"^- ([a-z0-9-]+) \| revision=(\S+) \| checked=(\d{4}-\d{2}-\d{2}) "
     r"\| max-age-days=([1-9][0-9]*) \| url=(https://\S+)$"
 )
-
 REQUIRED_EDGES = {
     "v0.10.6": {"v0.10.5"},
     "v0.10.7": {"v0.10.5"},
+    "v0.10.8": {"v0.10.5"},
+    "v0.10.9": {"v0.10.5", "v0.10.8"},
+    "v0.10.10": {"v0.10.6", "v0.10.8", "v0.10.9"},
     "v0.12.1": {"v0.10.2", "v0.11.1", "v0.11.3", "v0.11.5"},
     "v0.32.1": {"v0.3.6", "v0.3.7", "v0.11.5", "v0.30.1"},
     "v0.46.1": {"v0.45.6"},
@@ -406,6 +408,7 @@ def validate_release(
     today: date | None = None,
     signature_verifier: SignatureVerifier | None = None,
     tag_verifier: TagVerifier | None = None,
+    tagged_release: bool = False,
 ) -> list[str]:
     errors: list[str] = []
     if not VERSION_RE.fullmatch(release):
@@ -452,9 +455,9 @@ def validate_release(
         boundary_digests,
         source_lock_digest(plan_text),
         today=today,
+        tagged_release=tagged_release,
         **kwargs,
     )
-
 
 def main() -> int:
     parser = argparse.ArgumentParser()
@@ -463,6 +466,7 @@ def main() -> int:
     parser.add_argument("--release")
     parser.add_argument("--candidate")
     parser.add_argument("--repository", type=Path, default=Path("."))
+    parser.add_argument("--tagged-release", action="store_true")
     args = parser.parse_args()
 
     plan_text = args.plan.read_text(encoding="utf-8")
@@ -477,6 +481,7 @@ def main() -> int:
                 args.release,
                 args.repository,
                 candidate=args.candidate,
+                tagged_release=args.tagged_release,
             )
         )
     if errors:

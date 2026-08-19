@@ -1,0 +1,32 @@
+name: Signed Release Tag Check
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  verify-tag:
+    name: Verify signer and approved evidence target
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: release-trust
+      deployment: false
+    env:
+      GESTUR_RELEASE_TRUST_POLICY_SHA256: ${{ vars.GESTUR_RELEASE_TRUST_POLICY_SHA256 }}
+
+    steps:
+      - name: Checkout full signed history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Import reviewed public verification keys
+        run: |
+          grep -q '^-----BEGIN PGP PUBLIC KEY BLOCK-----$' security/release-trust-keyring.asc
+          gpg --batch --import security/release-trust-keyring.asc
+      - name: Validate current tag and release evidence
+        run: scripts/validate-tagged-release.sh "$GITHUB_REF_NAME"

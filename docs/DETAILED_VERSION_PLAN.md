@@ -67,6 +67,12 @@ Accepted corrections:
   must form a distinct, signed, ancestor-ordered tag chain;
 - legal source sets retain the base instrument and each applicable amendment or
   authoritative consolidation instead of treating one amendment as the whole.
+- release reviewers, independent pentesters, and tag signers receive separate
+  key registries whose exact candidate-state digest is pinned outside Git;
+- pentest approval becomes a signed attestation over the exact candidate and
+  SHA-256-bound provider report and supporting artifact;
+- predecessor and newly created tags must be signed by an authorized tag-role
+  fingerprint, and the new tag receives its own protected CI validation.
 
 Accepted with qualification:
 
@@ -118,6 +124,26 @@ Rejected or corrected:
     and signed feasibility artifacts authorized for its candidate.
 12. Release candidates are members of the declared base/stop set; every lower
     declared version has a distinct signed tag in strict ancestry order.
+13. Reviewer, external-pentester, and tag-signer keys are role-separated; the
+    candidate's canonical registry digest must match a protected external pin.
+14. The independent pentest attestation binds the exact candidate, tester,
+    scope, provider report digest, support digest, and detached signature.
+15. Both predecessor tags and the current tag require an authorized tag-signer
+    fingerprint; the current tag must target the approved evidence-only commit.
+
+## Machine-Enforced Release Trust Root
+
+The three role registries under `security/` are candidate inputs, not trust
+anchors by themselves. Their domain-separated canonical SHA-256 digest must
+match `GESTUR_RELEASE_TRUST_POLICY_SHA256`, supplied outside Git by the protected
+`release-trust` GitHub environment (or an equivalently controlled local release
+session). A malformed/missing pin, registry ambiguity, duplicate identity, or
+fingerprint reused across roles blocks release. Registry/pin changes require a
+pull request with two distinct approvals and a separate environment approver;
+self-review and administrator bypass are disabled. Until those external
+settings and at least one real identity per needed role exist, releases remain
+deliberately blocked. CODEOWNERS is routing evidence, not a substitute for this
+external enforcement.
 
 ## Machine-Enforced Boundary Feasibility Ledger
 
@@ -133,10 +159,11 @@ detached `Signature`. The reviewed commit must exist and precede the candidate;
 any later change under the declared scope invalidates the decision. At the
 consuming release, scope must include the boundary's planned implementation
 crate. `Scope` is a comma-separated list of repository-relative paths without
-spaces. The reviewer identity/fingerprint pair must be uniquely authorized by
-the candidate's `security/release-reviewers.txt`; a self-declared signing key is
-not trust. The signed record and support artifact are added only in the final
-evidence commit, which may not change implementation or roadmap content.
+spaces. The reviewer identity/fingerprint pair must be uniquely present in the
+candidate's `security/release-reviewers.txt`, and the complete registry set must
+match the protected external digest; candidate text alone is not trust. The
+signed record and support artifact are added only in the final evidence commit,
+which may not change implementation or roadmap content.
 
 <!-- boundary-feasibility:start -->
 - sqlite | decision-by=v0.10.2 | required-by=v0.12.1 | status=pending | evidence=none
@@ -159,6 +186,9 @@ consumer.
 <!-- dependency-locks:start -->
 - v0.10.6 <- v0.10.5
 - v0.10.7 <- v0.10.5
+- v0.10.8 <- v0.10.5
+- v0.10.9 <- v0.10.5, v0.10.8
+- v0.10.10 <- v0.10.6, v0.10.8, v0.10.9
 - v0.12.1 <- v0.10.2, v0.11.1, v0.11.3, v0.11.5
 - v0.32.1 <- v0.3.6, v0.3.7, v0.11.5, v0.30.1
 - v0.46.1 <- v0.45.6
@@ -204,7 +234,7 @@ adding, or moving a stop requires an explicit reviewable declaration change.
 - v0.7.0: v0.7.1
 - v0.8.0: v0.8.1
 - v0.9.0: v0.9.1
-- v0.10.0: v0.10.1, v0.10.2, v0.10.3, v0.10.4, v0.10.5, v0.10.6, v0.10.7
+- v0.10.0: v0.10.1, v0.10.2, v0.10.3, v0.10.4, v0.10.5, v0.10.6, v0.10.7, v0.10.8, v0.10.9, v0.10.10
 - v0.11.0: v0.11.1, v0.11.2, v0.11.3, v0.11.4, v0.11.5
 - v0.12.0: v0.12.1
 - v0.13.0: v0.13.1
@@ -425,6 +455,9 @@ adding, or moving a stop requires an explicit reviewable declaration change.
 | v0.10.5 | Define the cryptographically attributable review-evidence envelope used by feasibility and source gates. | Real temporary Git history and disposable reviewer key; nonexistent/non-ancestor commit, wrong scope, later scoped change, plan/support digest mutation, untrusted/ambiguous key, forged/wrong-key signature, merge evidence commit, and non-evidence changes all fail. |
 | v0.10.6 | Enforce the closed declared-release set and strict signed predecessor-tag ancestry. | Real temporary Git graph; undeclared release, missing/lightweight/unsigned/reused/out-of-order/non-ancestor predecessor tag, reused candidate commit, and pre-existing target tag fail; a complete signed chain passes. |
 | v0.10.7 | Define authoritative multi-instrument legal source sets and amendment/consolidation relationships. | Base act, applicable amendments, consolidation state, revision dates, precedence notes, freshness, and qualified applicability review are complete; missing-base and amendment-only fixtures fail. |
+| v0.10.8 | Establish a role-separated release trust policy anchored by a protected digest outside candidate-controlled Git history. | Real temporary Git history proves missing/malformed/mismatched pins, duplicate identities/fingerprints, cross-role key reuse, and candidate-only self-authorization fail; repository ruleset and `release-trust` environment evidence shows two distinct approvals, no self-review, and no administrator bypass. |
+| v0.10.9 | Replace field-only pentest acceptance with a signed external-pentester attestation over the exact candidate and digest-bound provider artifacts. | Real disposable external-pentester key and Git evidence commit; unsigned/forged/wrong-role attestation, fabricated tester, wrong candidate, mutated provider report, mutated support artifact, unsafe path, and non-PASS result all fail. |
+| v0.10.10 | Authorize predecessor/current release tag fingerprints and validate every newly created tag against its approved evidence commit. | Real disposable OpenPGP keys and signed annotated tags; arbitrary valid key, missing/ambiguous authorization, wrong target, non-evidence target, altered evidence, lightweight/unsigned tag, and broken ancestry fail; protected tag-triggered CI passes the authorized complete chain. |
 
 Phase exit: canonical envelopes and crypto-provider contracts are independently
 reviewed before storage/PII implementation; the foundation remains
@@ -816,11 +849,11 @@ Every release additionally requires
 candidate `Reviewed-Commit`, attributable `Reviewer` and `Reviewer-Key`, the
 SHA-256 `Source-Lock-Digest` printed by the validator, support `Evidence` and
 its SHA-256 `Evidence-Digest`, plus a verified detached `Signature`. The
-reviewer/key pair must be uniquely authorized in the candidate's reviewer
+reviewer/key pair must be uniquely present in the externally pinned reviewer
 registry. The attestation may be no more than seven days old. It and its support
-record are added in the evidence-only child commit, and the later signed release
-tag binds the full evidence set. A current date or digest without attributable
-review is insufficient.
+record are added in the evidence-only child commit, and the later authorized
+signed release tag binds the full evidence set. A current date or digest without
+attributable review is insufficient.
 
 <!-- source-locks:start -->
 - semver | revision=2.0.0 | checked=2026-08-19 | max-age-days=365 | url=https://semver.org/

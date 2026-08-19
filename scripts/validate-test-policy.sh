@@ -18,6 +18,8 @@ grep -q '^## No Waiver For Claimed Behavior$' docs/testing-policy.md
 grep -q 'scripts/validate-test-policy.sh' scripts/checks.sh
 grep -q 'scripts/test_validate_detailed_version_plan.py' scripts/checks.sh
 grep -q 'scripts/test_validate_release_evidence.py' scripts/checks.sh
+grep -q 'scripts/test_release_trust_policy.py' scripts/checks.sh
 grep -q 'scripts/test_release_signature_integration.py' scripts/checks.sh
+grep -q 'scripts/validate-tagged-release.sh' .github/workflows/release-tag.yml
 grep -q 'Testing policy' README.md
 grep -q 'Real-system / acceptance tests' .github/PULL_REQUEST_TEMPLATE.md

@@ -20,8 +20,14 @@ Status: v0.1.0 foundation controls.
   strict ancestor chain, and only an evidence child commit may follow candidate
   freeze.
 - Source and feasibility reviews bind real commits, scoped-change invalidation,
-  support digests, candidate-authorized reviewer key fingerprints, and verified
+  support digests, externally pinned reviewer key fingerprints, and verified
   detached signatures.
+- Role-separated release trust registries are bound to an external digest;
+  missing pins, ambiguous entries, and cross-role fingerprint reuse fail closed.
+- Independent pentest approval requires an externally authorized signature and
+  digest-bound provider report/support evidence, not repository fields alone.
+- Tag fingerprints require explicit authorization, and every newly pushed tag
+  receives a protected signer/target/evidence validation workflow.
 - EUPL-1.2 internal workspace with no registry publishing path.
 
 ## Designed Now, Implemented Later
@@ -39,3 +45,5 @@ Status: v0.1.0 foundation controls.
 
 Planned controls are not current product claims. Each becomes active only when
 its release deliverables, tests, documentation, and pentest evidence exist.
+No release role is currently populated, so release gates intentionally remain
+blocked until the external two-person bootstrap is completed.

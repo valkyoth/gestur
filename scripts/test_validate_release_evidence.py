@@ -157,7 +157,7 @@ class ReleaseEvidenceValidatorTests(unittest.TestCase):
                 "v0.2.0",
                 candidate,
                 declared,
-                tag_verifier=lambda _root, _tag: False,
+                tag_verifier=lambda _root, _tag: None,
             )
         self.assert_error(errors, "predecessor tag v0.1.0 has no valid signature")
 

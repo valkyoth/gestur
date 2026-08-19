@@ -36,7 +36,11 @@ No tag or workflow publishes a Cargo package.
   so accidental row deletion, addition, or reassignment fails closed.
 - A requested release must be one declared base, one stop in that base's exact
   declaration, or `v1.0.0`. Every lower declared release must have a distinct,
-  cryptographically valid annotated tag in ancestor order before the candidate.
+  cryptographically valid annotated tag from an authorized release-tag signer
+  in ancestor order before the candidate.
+- Candidate-controlled registry text is never a complete trust anchor. The
+  exact role-separated reviewer, external-pentester, and tag-signer registry
+  digest must match a protected value outside Git; key reuse across roles fails.
 - Every v0 patch release states its compatibility impact explicitly. Gestur is
   in Semantic Versioning major-zero development; from v1.0.0 onward, fixes,
   compatible features, and breaking changes use patch, minor, and major
@@ -80,7 +84,7 @@ checked again at release time: pending decisions block `v0.10.2`, and a later
 consumer cannot release unless its exact boundary is qualified with evidence.
 The evidence names an existing ancestor commit and complete reviewed scope,
 binds the exact boundary-plan and supporting-evidence digests, and carries an
-attributable detached signature from a candidate-authorized reviewer key. A
+attributable detached signature from an externally pinned reviewer-role key. A
 later scoped change invalidates it; the consuming release must cover the planned
 boundary implementation crate.
 
@@ -132,7 +136,12 @@ release notes must state those limitations plainly.
   feasibility records require real Git ancestry, scope invalidation checks,
   support digests, reviewer identity/key, and a valid detached signature.
 - Reject undeclared releases and require every lower declared version's signed
-  annotated tag to be a distinct ancestor in numeric order.
+  annotated tag to be a distinct ancestor in numeric order and signed by an
+  externally pinned authorized tag-role fingerprint.
+- Verify the independent pentest through an external-pentester signature over
+  the exact candidate and digests of both provider report and support artifact.
+- After tag creation, require protected tag-triggered CI to revalidate its
+  signer, target evidence commit, full evidence set, and predecessor ancestry.
 
 ## Pentest And Tag Stop
 
@@ -145,15 +154,21 @@ For every version:
    stop reached. Run pentest for this exact commit.
 4. Record temporary findings only in ignored root PENTEST.md. Fix every finding,
    add regression tests, and repeat from a new candidate until clean.
-5. Review sources and applicable feasibility scopes against the final candidate;
+5. Confirm the candidate's three role registries match the protected external
+   trust-policy digest. Registry changes require two-person review and separate
+   protected-environment approval; candidate content cannot self-authorize.
+6. Review sources and applicable feasibility scopes against the final candidate;
    produce attributable signed records and support digests.
-6. Create one child evidence commit containing only the exact pentest report,
-   current source review, and required feasibility records/support/signatures.
-7. Run the release gate against its parent candidate. It rejects any other
+7. Obtain a signed external-pentester attestation binding the exact candidate,
+   scope, provider report digest, support digest, identity, and role key.
+8. Create one child evidence commit containing only the signed/digest-bound
+   pentest set and authorized source/feasibility records/support/signatures.
+9. Run the release gate against its parent candidate. It rejects any other
    changed path, invalid review, undeclared version, or broken predecessor chain.
-8. Confirm GitHub CI and CodeQL default setup are green.
-9. Create and push a signed tag on the evidence commit only on explicit
-   maintainer instruction.
+10. Confirm GitHub CI and CodeQL default setup are green.
+11. Create and push a signed tag on the evidence commit only on explicit
+    maintainer instruction; protected tag-triggered CI must then validate the
+    current tag signer and target before the tag is treated as a release.
 
 The Exit criteria in every section below and every detailed patch stop include
 this complete rule. A pentest is not replaced by automated testing, fuzzing,
@@ -197,6 +212,9 @@ Their full deliverables and mandatory proof live in the detailed register.
 | v0.10.5 | Bind feasibility and source evidence to real commits, scope, digests, reviewer keys, and verified detached signatures. |
 | v0.10.6 | Reject undeclared releases and enforce distinct signed predecessor tags in strict ancestry order. |
 | v0.10.7 | Keep legal base instruments, applicable amendments, and consolidation state as one governed source set. |
+| v0.10.8 | Anchor role-separated release identities to a protected digest outside candidate-controlled Git. |
+| v0.10.9 | Require signed external pentest attestations over exact-candidate report and support digests. |
+| v0.10.10 | Authorize tag signer fingerprints and validate each newly created tag in protected CI. |
 | v0.99.1 | Establish one authoritative lifecycle for badge, Wallet, network, access, and parking projections. |
 | v0.100.1 | Qualify multi-printer routing and failover on two real supported devices. |
 | v0.101.1 | Bound guest Wi-Fi credentials and exclude router-administration authority. |

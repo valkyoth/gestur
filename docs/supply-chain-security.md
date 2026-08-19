@@ -16,9 +16,15 @@ source policy, tool pins, action SHA pins, and SBOM still form release evidence.
 - Never store a crates.io credential while all packages are private.
 - Sign release tags and publish checksums/provenance only after the pentest stop.
 - Accept only roadmap-declared releases. Verify every predecessor as a distinct
-  signed annotated tag in strict Git ancestry order.
+  signed annotated tag from an externally pinned authorized fingerprint in
+  strict Git ancestry order.
 - Freeze the candidate, then permit one evidence-only child commit whose signed
-  source/feasibility reviews and exact pentest report bind that candidate.
+  source/feasibility reviews and signed, digest-bound pentest evidence bind that
+  candidate.
+- Keep reviewer, external-pentester, and tag-signer roles separate; bind their
+  candidate registries to a protected digest outside Git.
+- Validate the newly pushed tag's signer and exact evidence target in protected
+  tag-triggered CI before treating it as a release.
 
 ## Dependency Admission
 

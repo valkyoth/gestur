@@ -10,8 +10,11 @@ from datetime import date
 from pathlib import Path, PurePosixPath
 from typing import Callable
 
+from release_trust_policy import identity_is_authorized, validate_trust_policy
+from validate_pentest_evidence import validate_pentest_evidence
+
 SignatureVerifier = Callable[[Path, Path], str | None]
-TagVerifier = Callable[[Path, str], bool]
+TagVerifier = Callable[[Path, str], str | None]
 
 IMPLEMENTATION_SCOPES = {
     "sqlite": "crates/gestur-db-sqlite",
@@ -80,8 +83,13 @@ def default_signature_verifier(signature: Path, record: Path) -> str | None:
     return match.group(1) if match else None
 
 
-def default_tag_verifier(repository: Path, tag: str) -> bool:
-    return git(repository, "verify-tag", "--raw", tag).returncode == 0
+def default_tag_verifier(repository: Path, tag: str) -> str | None:
+    result = git(repository, "verify-tag", "--raw", tag)
+    if result.returncode != 0:
+        return None
+    status = f"{result.stdout}\n{result.stderr}"
+    match = re.search(r"^\[GNUPG:\] VALIDSIG ([0-9A-F]+) ", status, re.MULTILINE)
+    return match.group(1) if match else None
 
 
 def safe_path(
@@ -128,19 +136,9 @@ def file_digest(path: Path) -> str:
 def reviewer_is_trusted(
     repository: Path, candidate: str, reviewer: str, reviewer_key: str
 ) -> bool:
-    content = git_output(
-        repository, "show", f"{candidate}:security/release-reviewers.txt"
+    return identity_is_authorized(
+        repository, candidate, "reviewer", reviewer_key, reviewer
     )
-    if content is None:
-        return False
-    entries = [
-        tuple(part.strip() for part in line.split("|", 1))
-        for line in content.splitlines()
-        if line and not line.startswith("#") and "|" in line
-    ]
-    return entries.count((reviewer_key, reviewer)) == 1 and sum(
-        key == reviewer_key for key, _name in entries
-    ) == 1
 
 
 def verify_support_and_signature(
@@ -225,8 +223,13 @@ def validate_predecessors(
         if tagged_commit is None:
             errors.append(f"{release}: predecessor tag {tag} has no commit")
             continue
-        if not tag_verifier(repository, tag):
+        signer = tag_verifier(repository, tag)
+        if signer is None:
             errors.append(f"{release}: predecessor tag {tag} has no valid signature")
+        elif not identity_is_authorized(
+            repository, candidate, "tag-signer", signer
+        ):
+            errors.append(f"{release}: predecessor tag {tag} signer is not authorized")
         if prior_commit is not None:
             if tagged_commit == prior_commit:
                 errors.append(f"{release}: predecessor tag {tag} reuses a release commit")
@@ -365,6 +368,8 @@ def validate_release_evidence(
     today: date | None = None,
     signature_verifier: SignatureVerifier = default_signature_verifier,
     tag_verifier: TagVerifier = default_tag_verifier,
+    expected_trust_policy_digest: str | None = None,
+    tagged_release: bool = False,
 ) -> list[str]:
     errors: list[str] = []
     root = repository.resolve()
@@ -373,6 +378,9 @@ def validate_release_evidence(
         return ["release evidence: candidate commit is missing or invalid"]
     if not commit_exists(root, candidate_commit):
         return ["release evidence: candidate commit does not exist"]
+    errors.extend(
+        validate_trust_policy(root, candidate_commit, expected_trust_policy_digest)
+    )
     if git_output(root, "status", "--porcelain", "--untracked-files=all"):
         errors.append("release evidence: worktree is not clean")
     if git_output(root, "rev-parse", "HEAD^") != candidate_commit:
@@ -380,7 +388,19 @@ def validate_release_evidence(
     head_line = git_output(root, "rev-list", "--parents", "-n", "1", "HEAD")
     if head_line is None or len(head_line.split()) != 2:
         errors.append("release evidence: evidence commit must have exactly one parent")
-    if git_output(root, "rev-parse", f"refs/tags/{release}") is not None:
+    tagged_commit = git_output(root, "rev-parse", f"refs/tags/{release}^{{commit}}")
+    if tagged_release:
+        head = git_output(root, "rev-parse", "HEAD")
+        if tagged_commit is None:
+            errors.append(f"{release}: current release tag is missing")
+        elif tagged_commit != head:
+            errors.append(f"{release}: current tag does not target the evidence commit")
+        signer = tag_verifier(root, release) if tagged_commit is not None else None
+        if signer is None:
+            errors.append(f"{release}: current tag has no valid signature")
+        elif not identity_is_authorized(root, candidate_commit, "tag-signer", signer):
+            errors.append(f"{release}: current tag signer is not authorized")
+    elif tagged_commit is not None:
         errors.append(f"{release}: tag already exists")
 
     validate_predecessors(
@@ -391,7 +411,7 @@ def validate_release_evidence(
         errors,
         tag_verifier,
     )
-    allowed_paths = {f"security/pentest/{release}.md"}
+    allowed_paths: set[str] = set()
     release_key = version_key(release)
     for boundary, entry in boundaries.items():
         if release_key < version_key(entry["decision_by"]) or entry["status"] == "pending":
@@ -412,6 +432,15 @@ def validate_release_evidence(
         root,
         candidate_commit,
         source_digest,
+        today or date.today(),
+        errors,
+        allowed_paths,
+        signature_verifier,
+    )
+    validate_pentest_evidence(
+        release,
+        root,
+        candidate_commit,
         today or date.today(),
         errors,
         allowed_paths,

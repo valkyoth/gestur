@@ -7,6 +7,7 @@ scripts/check_doc_links.sh
 scripts/check_release_plan.sh
 python3 scripts/test_validate_detailed_version_plan.py
 python3 scripts/test_validate_release_evidence.py
+python3 scripts/test_release_trust_policy.py
 python3 scripts/test_release_signature_integration.py
 scripts/check_action_pins.sh
 scripts/validate-workspace-policy.py

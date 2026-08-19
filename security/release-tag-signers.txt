@@ -1,0 +1,6 @@
+# Authorized release tag signers
+#
+# Format: UPPERCASE_GPG_FINGERPRINT | exact release signer identity
+#
+# No tag signer is authorized yet. Retain authorized historical fingerprints
+# while their tags remain in the supported release ancestry.

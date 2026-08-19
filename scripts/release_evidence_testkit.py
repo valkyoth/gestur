@@ -8,9 +8,12 @@ from datetime import date
 from pathlib import Path
 
 import validate_release_evidence as release_validator
+from release_trust_policy import trust_policy_digest
 
 REVIEWER_KEY = "A" * 40
 BOUNDARY_REVIEWER_KEY = "B" * 40
+TAG_SIGNER_KEY = "C" * 40
+PENTESTER_KEY = "D" * 40
 SOURCE_DIGEST = "b" * 64
 BOUNDARY_DIGEST = "c" * 64
 
@@ -26,6 +29,14 @@ class GitFixture:
             "security/release-reviewers.txt",
             f"{REVIEWER_KEY} | Release Reviewer\n"
             f"{BOUNDARY_REVIEWER_KEY} | Boundary Reviewer\n",
+        )
+        self.write(
+            "security/release-tag-signers.txt",
+            f"{TAG_SIGNER_KEY} | Release Tag Signer\n",
+        )
+        self.write(
+            "security/external-pentesters.txt",
+            f"{PENTESTER_KEY} | Independent Pentester\n",
         )
         self.commit("root")
 
@@ -58,11 +69,51 @@ class GitFixture:
 def valid_signature(signature: Path, record: Path) -> str | None:
     if signature.read_text(encoding="utf-8") != "valid\n":
         return None
+    if "pentest" in record.parts:
+        return PENTESTER_KEY
     return BOUNDARY_REVIEWER_KEY if "feasibility" in record.parts else REVIEWER_KEY
 
 
-def valid_tag(_repository: Path, _tag: str) -> bool:
-    return True
+def valid_tag(_repository: Path, _tag: str) -> str | None:
+    return TAG_SIGNER_KEY
+
+
+def write_pentest_evidence(
+    fixture: GitFixture,
+    release: str,
+    candidate: str,
+    *,
+    tester: str = "Independent Pentester",
+    tester_key: str = PENTESTER_KEY,
+    reviewed: str | None = None,
+    status: str = "PASS",
+    report_path: str | None = None,
+    report_digest: str | None = None,
+    evidence_digest: str | None = None,
+    signature: str = "valid\n",
+) -> None:
+    report_relative = report_path or f"security/pentest/reports/{release}/report.md"
+    report = "Independent penetration-test report\n"
+    fixture.write(report_relative, report)
+    support_relative = f"security/pentest/support/{release}/provider-evidence.txt"
+    support = "Provider scope and clean-retest evidence\n"
+    fixture.write(support_relative, support)
+    attestation_relative = f"security/pentest/{release}.md"
+    fixture.write(
+        attestation_relative,
+        f"Status: {status}\n"
+        "Date: 2026-08-19\n"
+        f"Reviewed-Commit: {reviewed or candidate}\n"
+        "Scope: full release candidate\n"
+        f"Tester: {tester}\n"
+        f"Tester-Key: {tester_key}\n"
+        f"Report: {report_relative}\n"
+        f"Report-Digest: {report_digest or hashlib.sha256(report.encode()).hexdigest()}\n"
+        f"Evidence: {support_relative}\n"
+        f"Evidence-Digest: {evidence_digest or hashlib.sha256(support.encode()).hexdigest()}\n"
+        f"Signature: {attestation_relative}.asc\n",
+    )
+    fixture.write(f"{attestation_relative}.asc", signature)
 
 
 def write_source_evidence(
@@ -92,7 +143,7 @@ def write_source_evidence(
         f"Signature: {record_relative}.asc\n",
     )
     fixture.write(f"{record_relative}.asc", signature)
-    fixture.write(f"security/pentest/{release}.md", "Status: PASS\n")
+    write_pentest_evidence(fixture, release, candidate)
 
 
 def write_boundary_evidence(
@@ -143,6 +194,8 @@ def validate(
     boundary_digest: str = BOUNDARY_DIGEST,
     signature_verifier=valid_signature,
     tag_verifier=valid_tag,
+    expected_trust_policy_digest: str | None = None,
+    tagged_release: bool = False,
 ) -> list[str]:
     selected = boundaries or {}
     return release_validator.validate_release_evidence(
@@ -156,4 +209,9 @@ def validate(
         today=date(2026, 8, 19),
         signature_verifier=signature_verifier,
         tag_verifier=tag_verifier,
+        expected_trust_policy_digest=(
+            expected_trust_policy_digest
+            or trust_policy_digest(fixture.root, candidate)
+        ),
+        tagged_release=tagged_release,
     )

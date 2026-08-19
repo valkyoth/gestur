@@ -12,11 +12,13 @@ test -f docs/DETAILED_VERSION_PLAN.md
 test -f docs/CRATE_PLAN.md
 test -f docs/PRODUCT_VISION.md
 test -f .github/workflows/release.yml
+test -f .github/workflows/release-tag.yml
 grep -q '^version = "0.1.0"$' Cargo.toml
 grep -q '^channel = "1.97.1"$' rust-toolchain.toml
 grep -q '^rust-version = "1.97.1"$' Cargo.toml
 grep -q '^  workflow_dispatch:$' .github/workflows/release.yml
 ! grep -q 'cargo publish' .github/workflows/release.yml
 ! grep -q 'CARGO_REGISTRY_TOKEN' .github/workflows/release.yml
+! grep -q 'cargo publish' .github/workflows/release-tag.yml
 scripts/validate-workspace-policy.py
 scripts/validate_detailed_version_plan.py
